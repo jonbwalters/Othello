@@ -1,0 +1,178 @@
+* {
+    margin: auto;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+}
+
+div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.mobile {
+    display: none;
+}
+
+.desktop {
+    margin: 0;
+    width: 100%;
+}
+
+
+
+
+td {
+    text-align: center;
+    background-color: #4b9b4f; 
+    width: 65px;
+    height: 65px;
+}
+
+.validMoveHere {
+    text-align: center;
+    background-color: #a3e4a6;
+    width: 65px;
+    height: 65px;
+}
+
+.white-turn-text {
+    text-align: center;
+    color: black;
+    font-family: "open sans";
+    font-size: 55px;
+}
+
+.black-turn-text {
+    text-align: center;
+    font-family: "open sans";
+    font-size: 55px;
+    color: lightgray;
+}
+
+.black-piece {
+    width: 20px;
+    height: 20px;
+    padding: 12px;
+    background-color: black;
+    border: 1px solid white;
+    border-radius: 50px;
+}
+
+.white-piece {
+    width: 20px;
+    height: 20px;
+    padding: 12px;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 50px;
+}
+
+
+w {
+    display: inline-block;
+}
+
+#divider {
+    font-size: 90px;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+b {
+    display: inline-block;
+}
+
+@media screen and (max-width: 560px) {
+    .white-piece {
+        height: 4.5vw;
+        width: 4.5vw;
+    }
+
+    .black-piece {
+        height: 4.5vw;
+        width: 4.5vw;
+    }
+
+    td {
+        width: 12vw;
+        height: 12vw;
+    }
+
+    .white-turn-text {
+        font-size: 40px;
+    }
+    
+    .black-turn-text {
+        font-size: 40px;
+    }
+
+    table {
+        margin: 0;
+    }
+
+    .mobile {
+        display: block;
+    }
+
+    .desktop {
+        display: none;
+    }
+
+    .white-turn-text {
+        -webkit-transform:rotate(-180deg);
+        -moz-transform:rotate(-180deg);
+        -o-transform:rotate(-180deg);
+        transform:rotate(-180deg);
+        filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=2);    
+    }
+}
+
+@media screen and (max-width: 380px) {
+    .white-piece {
+        height: 3vw;
+        width: 3vw;
+    }
+
+    .black-piece {
+        height: 3vw;
+        width: 3vw;
+    }
+}
+
+@media screen and (max-width: 345px) {
+    .white-piece {
+        height: 2.5vw;
+        width: 2.5vw;
+    }
+
+    .black-piece {
+        height: 2.5vw;
+        width: 2.5vw;
+    }
+}
+
+@media screen and (max-width: 300px) {
+    .white-piece {
+        height: 1.5vw;
+        width: 1.5vw;
+    }
+
+    .black-piece {
+        height: 1.5vw;
+        width: 1.5vw;
+    }
+
+    .white-turn-text {
+        font-size: 35px;
+    }
+    
+    .black-turn-text {
+        font-size: 35px;
+    }
+}
