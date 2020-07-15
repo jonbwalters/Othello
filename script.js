@@ -1,14 +1,14 @@
 /*----------- Game State Data ----------*/
 
 const board = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 2, 0, 0, 0],
-    [0, 0, 0, 4, 3, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,1,2,0,0,0],
+    [0,0,0,4,3,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
 ]
     
 
@@ -69,7 +69,8 @@ let player = {
 function getPlayerPieces() {
     if (turn) {
         playerPieces = whitesPieces;
-    } else {
+    } 
+    else {
         playerPieces = blacksPieces;
     }
     resetPlayerPossibleMoves()
@@ -96,10 +97,10 @@ function resetPlayerPossibleMoves()
 {
     if(turn)
     {
-        player.colorId = 0;
+        player.colorId = 0;   //0 for white
     }
     else{
-        player.colorId = 1;
+        player.colorId = 1;   //1 for black
     }
     //0 for false and 1 for true is space is a possible move for the current color
     player.possiblemoves = [
@@ -112,6 +113,12 @@ function resetPlayerPossibleMoves()
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0]
     ]
+    for(i=0; i<possiblePlaces.length; i++)
+    {
+        possiblePlaces[i].remove();
+        //possiblePlaces[i].HTML = '<td></td>';
+    }
+    possiblePlaces = document.querySelector("p")
     getAvailableMoves()
     
 }
@@ -138,7 +145,7 @@ function getAvailableMoves() {
         
         //First Check left
         j = col;
-        while(board[row][j-1]%2 != player.colorId && j>=0)
+        while(j>=2 && board[row][j-1]!= 0 && board[row][j-1]%2 != player.colorId)
         {
             // check to see if spot two to the left piece is open or not    
             if ( board[row][j-2] == 0)
@@ -148,15 +155,19 @@ function getAvailableMoves() {
                 j--;
                 
             }
-            else if (((board[row][j-1])%2) == ((board[row][j-2])%2))
+            else if (((board[row][j-1])%2) == ((board[row][j-2])%2) && board[row][j-2] !=0)
             {
                 j--;
-            }    
+            }   
+            else
+            {
+                break
+            } 
         }
 
         //Next Check Right
         j = col;
-        while(board[row][j+1]%2 != player.colorId && j<80)
+        while(j<6 && board[row][j+1]!=0 && board[row][j+1]%2 != player.colorId)
         {
             // check to see if spot two to the left piece is open or not    
             if ( board[row][j+2] == 0)
@@ -166,15 +177,19 @@ function getAvailableMoves() {
                 j++;
                 
             }
-            else if (((board[row][j-1])%2) == ((board[row][j-2])%2))
+            else if (((board[row][j-1])%2) == ((board[row][j-2])%2) && board[row][j-2]!=0)
             {
                 j++;
             }    
+            else
+            {
+                break
+            } 
         }
 
         //check upwards 
         k = row;
-        while(board[k-1][col]%2 != player.colorId && k>=0)
+        while( k>=2 && board[k-1][col]!=0 && board[k-1][col]%2 != player.colorId)
         {
             
             // check to see if spot two up is open or not   
@@ -185,50 +200,142 @@ function getAvailableMoves() {
                 k--;
                 
             }
-            else if (((board[k-1][col])%2) == ((board[k-2][col])%2))
+            else if (((board[k-1][col])%2) == ((board[k-2][col])%2) && board[k-2][col]!=0)
             {
                 k--;
-            }    
+            }   
+            else
+            {
+                break
+            }  
         }
 
         // check downards
         k = row;
-        while(board[k+1][col]%2 != player.colorId && k<8)
+        while(k<6 && board[k+1][col] !=0 && board[k+1][col]%2 != player.colorId )
         {
             
-            // check to see if spot two up is open or not   
+            // check to see if spot two down is open or not   
             if ( board[k+2][col] == 0)
             {
                 player.possiblemoves[k+2][col] = 1;
                 cells[(k+2)*8+col].innerHTML = `<p class="validMoveHere" ></p>`;
                 k++; 
             }
-            else if (((board[k+1][col])%2) == ((board[k+2][col])%2))
+            else if (((board[k+1][col])%2) == ((board[k+2][col])%2) && board[k+2][col] !=0)
             {
                 k++;
             }    
+            else
+            {
+                break
+            } 
         }
 
         // check NorthWest
         k = row;
         j = col;
-        while(board[k-1][j-1]%2 != player.colorId && k>=0 && j >= 0)
+        while(k>=2 && j >= 2 && board[k-1][j-1]!=0 && board[k-1][j-1]%2 != player.colorId)
         {
             
-            // check to see if spot two up is open or not   
-            if ( board[k-1][j-1] == 0)
+            // check to see if spot two northwest is open or not   
+            if ( board[k-2][j-2] == 0)
             {
-                player.possiblemoves[k-2][j-1] = 1;
-                cells[(k-2)*8+col-2].innerHTML = `<p class="validMoveHere" ></p>`;
-                console.log( cells[(k-22)*8+col-2].innerHTML)
+                player.possiblemoves[k-2][j-2] = 1;
+                cells[(k-2)*8+(j-2)].innerHTML = `<p class="validMoveHere" ></p>`;
                 k--;
                 j--;
                 
             }
-            else if (((board[k-1][j-1])%2) == ((board[k-2][j-2])%2))
+            else if (((board[k-1][j-1])%2) == ((board[k-2][j-2])%2) && board[k-2][j-2] != 0)
             {
                 k--;
                 j--;
+            } 
+            else
+            {
+                break
+            }    
+
+        }
+
+        // check NorthEast
+        k = row;
+        j = col;
+        while( k>=2 && j < 6 && board[k-1][j+1]!=0 && board[k-1][j+1]%2 != player.colorId)
+        {
+            
+            // check to see if spot two northwest is open or not   
+            if ( board[k-2][j+2] == 0)
+            {
+                player.possiblemoves[k-2][j+2] = 1;
+                cells[(k-2)*8+(j+2)].innerHTML = `<p class="validMoveHere" ></p>`;
+                k--;
+                j++;
+                
+            }
+            else if (((board[k-1][j+1])%2) == ((board[k-2][j+2])%2) && board[k-2][j+2] !=0 )
+            {
+                k--;
+                j++;
+            } 
+            else
+            {
+                break
+            }    
+
+        }
+
+        // check SouthEast
+        k = row;
+        j = col;
+        while(k<6 && j < 6 && board[k+1][j+1]!=0 && board[k+1][j+1]%2 != player.colorId )
+        {
+            
+            // check to see if spot two northwest is open or not   
+            if ( board[k+2][j+2] == 0)
+            {
+                player.possiblemoves[k+2][j+2] = 1;
+                cells[(k+2)*8+(j+2)].innerHTML = `<p class="validMoveHere" ></p>`;
+                k++;
+                j++;
+                
+            }
+            else if (((board[k+1][j+1])%2) == ((board[k+2][j+2])%2) && board[k+2][j+2] !=0 )
+            {
+                k++;
+                j++;
+            } 
+            else
+            {
+                break
+            }    
+
+        }
+
+        // check SouthWest
+        k = row;
+        j = col;
+        while(k<6 && j >= 2 && board[k+1][j-1]!=0 && board[k+1][j-1]%2 != player.colorId )
+        {
+            
+            // check to see if spot two northwest is open or not   
+            if ( board[k+2][j-2] == 0)
+            {
+                player.possiblemoves[k+2][j-2] = 1;
+                cells[(k+2)*8+(j-2)].innerHTML = `<p class="validMoveHere" ></p>`;
+                k++;
+                j--;
+                
+            }
+            else if (((board[k+1][j-1])%2) == ((board[k+2][j-2])%2) && board[k+2][j-2] !=0 )
+            {
+                k++;
+                j--;
+            } 
+            else
+            {
+                break
             }    
 
         }
@@ -240,146 +347,314 @@ function getAvailableMoves() {
 
 // testing placement of pieces onto the board
 function placePiece(row, col){
+    //start and end are arrays with the starting and ending indices of the pieces boxing in those to be changed
     if(turn)
-    {
+    {    
         cells[row*8+col].innerHTML = '<w class="white-piece" id="'+nextwhitePieceId+'"></w>';
         //console.log("THIS IS CELL:" + cells[row*8+col])
         whitesPieces = document.querySelectorAll("w");
         board[row][col] = nextwhitePieceId;
-        nextwhitePieceId++;
-        //replaceMiddlePieces()
-        changePlayer()
+        nextwhitePieceId+=2;
+        replaceMiddlePieces(row,col)
+        changePlayer();
+        
     }
     else{
         cells[row*8+col].innerHTML = '<b class="black-piece" id="'+nextblackPieceId+'"></b>';
         blacksPieces = document.querySelectorAll("b");
         board[row][col] = nextblackPieceId;
-        nextblackPieceId++;
-        //replaceMiddlePieces()
-        changePlayer()
+        nextblackPieceId+=2;
+        replaceMiddlePieces(row,col)
+        changePlayer();
     } 
+
+}
+
+function changePiece(row, col){
+    //row and col are the position in the matrix to be changed
+    if(turn)
+    {   
+        cells[row*8+col].innerHTML = '<w class="white-piece" id="'+nextwhitePieceId+'"></w>';
+        whitesPieces = document.querySelectorAll("w");
+        blacksPieces = document.querySelectorAll("b");
+        board[row][col] = nextwhitePieceId;
+        nextwhitePieceId+=2;  
+    }
+    else{
+        cells[row*8+col].innerHTML = '<b class="black-piece" id="'+nextblackPieceId+'"></b>';
+        blacksPieces = document.querySelectorAll("b");
+        whitesPieces = document.querySelectorAll("w");
+        board[row][col] = nextblackPieceId;
+        nextblackPieceId+=2;
+    } 
+
 }
 
 // This Method Replaces all Pieces in the Middle of Two With New Color
+function replaceMiddlePieces(row,col)
+{
+    // row is the current row number of the new piece
+    // col is the current column number of the new piece
+    // need to check all directions for pieces that might need to be changed based on this placement.
 
+     //First Check left
+     j = col;
+     k = row;
+     endcol = j;
+     endrow = k;
+     while(j>=2 && board[row][j-1]!= 0 && board[row][j-1]%2 != player.colorId)
+     {
+         // check to see if spot two to the left piece is same color or not    
+         if ( board[row][j-2]%2 == player.colorId && board[row][j-2] != 0 )
+         {
+             endcol = j-2;
+             for (n=col-1; n>endcol; n--)
+             {
+                 changePiece(row,n);
+             }
+             break;
+             
+         }
+         else
+         {
+             j--;
+         } 
+     }
 
-/*
+     //Check right
+     j = col;
+     k = row;
+     endcol = j;
+     endrow = k;
+     while(j<6 && board[row][j+1]!= 0 && board[row][j+1]%2 != player.colorId)
+     {
+         // check to see if spot two away is same color or not    
+         if ( board[row][j+2]%2 == player.colorId && board[row][j+2] != 0)
+         {
+             endcol = j+2;
+             for (n=col+1; n<endcol; n++)
+             {
+                 changePiece(row,n);
+             }
+             break;
+             
+         }
+         else
+         {
+             j++;
+         } 
+     }
 
-// gives the cells on the board a 'click' based on the possible moves
-function giveCellsClick() {
-    if (selectedPiece.seventhSpace) {
-        cells[selectedPiece.indexOfBoardPiece + 7].setAttribute("onclick", "makeMove(7)");
-    }
-    if (selectedPiece.ninthSpace) {
-        cells[selectedPiece.indexOfBoardPiece + 9].setAttribute("onclick", "makeMove(9)");
-    }
-    if (selectedPiece.fourteenthSpace) {
-        cells[selectedPiece.indexOfBoardPiece + 14].setAttribute("onclick", "makeMove(14)");
-    }
-    if (selectedPiece.eighteenthSpace) {
-        cells[selectedPiece.indexOfBoardPiece + 18].setAttribute("onclick", "makeMove(18)");
-    }
-    if (selectedPiece.minusSeventhSpace) {
-        cells[selectedPiece.indexOfBoardPiece - 7].setAttribute("onclick", "makeMove(-7)");
-    }
-    if (selectedPiece.minusNinthSpace) {
-        cells[selectedPiece.indexOfBoardPiece - 9].setAttribute("onclick", "makeMove(-9)");
-    }
-    if (selectedPiece.minusFourteenthSpace) {
-        cells[selectedPiece.indexOfBoardPiece - 14].setAttribute("onclick", "makeMove(-14)");
-    }
-    if (selectedPiece.minusEighteenthSpace) {
-        cells[selectedPiece.indexOfBoardPiece - 18].setAttribute("onclick", "makeMove(-18)");
-    }
-}
+     //Check down
+     j = col;
+     k = row;
+     endcol = j;
+     endrow = k;
+     while(k<6 && board[k+1][col]!= 0 && board[k+1][col]%2 != player.colorId)
+     {
+         // check to see if spot two away is same color or not    
+         if ( board[k+2][col]%2 == player.colorId && board[k+2][col]!=0)
+         {
+             endrow = k+2;
+             for (n=row+1; n<endrow; n++)
+             {
+                 changePiece(n,col);
+             }
+             break;
+             
+         }
+         else
+         {
+             k++;
+         } 
+     }
 
-/* v when the cell is clicked v */
-/*
-// makes the move that was clicked
-function makeMove(number) {
-    document.getElementById(selectedPiece.pieceId).remove();
-    cells[selectedPiece.indexOfBoardPiece].innerHTML = "";
-    if (turn) {
-        cells[selectedPiece.indexOfBoardPiece + number].innerHTML = `<p class="red-piece" id="${selectedPiece.pieceId}"></p>`;
-        redsPieces = document.querySelectorAll("p");
-    }
-
-    let indexOfPiece = selectedPiece.indexOfBoardPiece
-    if (number === 14 || number === -14 || number === 18 || number === -18) {
-        changeData(indexOfPiece, indexOfPiece + number, indexOfPiece + number / 2);
-    } else {
-        changeData(indexOfPiece, indexOfPiece + number);
-    }
-}
-
-// Changes the board states data on the back end
-function changeData(indexOfBoardPiece, modifiedIndex, removePiece) {
-    board[indexOfBoardPiece] = null;
-    board[modifiedIndex] = parseInt(selectedPiece.pieceId);
-    if (turn && selectedPiece.pieceId < 12 && modifiedIndex >= 57) {
-        document.getElementById(selectedPiece.pieceId).classList.add("king")
-    }
-    if (turn === false && selectedPiece.pieceId >= 12 && modifiedIndex <= 7) {
-        document.getElementById(selectedPiece.pieceId).classList.add("king");
-    }
-    if (removePiece) {
-        board[removePiece] = null;
-        if (turn && selectedPiece.pieceId < 12) {
-            cells[removePiece].innerHTML = "";
-            blackScore--
+    //Check up
+    j = col;
+    k = row;
+    endcol = j;
+    endrow = k;
+    while(k>=2 && board[k-1][col]!= 0 && board[k-1][col]%2 != player.colorId)
+    {
+        // check to see if spot two away is same color or not    
+        if ( board[k-2][col]%2 == player.colorId &&  board[k-2][col]!=0 )
+        {
+            endrow = k-2;
+            for (n=row-1; n>endrow; n--)
+            {
+                changePiece(n,col);
+            }
+            break;
+            
         }
-        if (turn === false && selectedPiece.pieceId >= 12) {
-            cells[removePiece].innerHTML = "";
-            redScore--
-        }
+        else
+        {
+            k--;
+        } 
     }
-    resetSelectedPieceProperties();
-    removeCellonclick();
-    removeEventListeners();
+
+     //Check northWest
+    j = col;
+    k = row;
+    endcol = j;
+    endrow = k;
+    while(k>=2 && j>=2 && board[k-1][j-1]!= 0 && board[k-1][j-1]%2 != player.colorId)
+    {
+        // check to see if spot two away is same color or not    
+        if ( board[k-2][j-2]%2 == player.colorId && board[k-2][j-2]!=0 )
+        {
+            endrow = k-2;
+            endcol = j-2;
+            for (n=row-1; n>endrow; n--)
+            {
+                m = col-1; 
+                changePiece(n,m);
+                m-=1;
+            }
+            break;    
+        }
+        else
+        {
+            k--;
+            j--;
+        } 
+    }
+
+     //Check northEast
+    j = col;
+    k = row;
+    endcol = j;
+    endrow = k;
+    while(k>=2 && j<6 && board[k-1][j+1]!= 0 && board[k-1][j+1]%2 != player.colorId)
+    {
+        // check to see if spot two away is same color or not    
+        if ( board[k-2][j+2]%2 == player.colorId && board[k-2][j+2]!= 0 )
+        {
+            endrow = k-2;
+            endcol = j+2;
+            for (n=row-1; n>endrow; n--)
+            {
+                m = col+1; 
+                changePiece(n,m);
+                m+=1;
+            }
+            break;
+        }
+        else
+        {
+            k--;
+            j++;
+        } 
+    }
+
+    //Check southEast
+    j = col;
+    k = row;
+    endcol = j;
+    endrow = k;
+    while(k<6 && j<6 && board[k+1][j+1]!= 0 && board[k+1][j+1]%2 != player.colorId)
+    {
+        // check to see if spot two away is same color or not    
+        if ( board[k+2][j+2]%2 == player.colorId && board[k+2][j+2]!= 0 )
+        {
+            endrow = k+2;
+            endcol = j+2;
+            for (n=row+1; n<endrow; n++)
+            {
+                m = col+1; 
+                changePiece(n,m);
+                m+=1;
+            }
+            break;
+        }
+        else
+        {
+            k++;
+            j++;
+        } 
+    }
+
+     //Check southWest
+    j = col;
+    k = row;
+    endcol = j;
+    endrow = k;
+    while(k<6 && j>=2 && board[k+1][j-1]!= 0 && board[k+1][j-1]%2 != player.colorId)
+    {
+        // check to see if spot two away is same color or not    
+        if ( board[k+2][j-2]%2 == player.colorId && board[k+2][j-2]!= 0 )
+        {
+            endrow = k+2;
+            endcol = j-2;
+            for (n=row+1; n<endrow; n++)
+            {
+                m = col-1; 
+                changePiece(n,m);
+                m-=1;
+            }
+            break;
+        }
+        else
+        {
+            k++;
+            j--;
+        } 
+    }
+
+
+
 }
 
-// Checks for a win
+//Checks for a win
 function checkForWin() {
-    if (blackScore === 0) {
-        divider.style.display = "none";
-        for (let i = 0; i < whiteTurnText.length; i++) {
-            whiteTurnText[i].style.color = "black";
+    if( (blacksPieces.length+whitesPieces.length) == 64 || possiblePlaces.length == 0)
+    {
+        if (blacksPieces.length > whitesPieces.length)
+        {
+            divider.style.display = "none";
+            for (let i = 0; i < blackTurntext.length; i++) {            
+                blackTurntext[i].style.color = "black";
+                whiteTurnText[i].style.display = "none";
+                blackTurntext[i].textContent = "BLACK WINS!";
+            }
+
+        }
+        else if(blacksPieces.length < whitesPieces.length)
+        {
+            divider.style.display = "none";
+            for (let i = 0; i < blackTurntext.length; i++) {            
+                whiteTurnText[i].style.color = "black";
             blackTurntext[i].style.display = "none";
-            redTurnText[i].textContent = "White WINS!";
+            whiteTurnText[i].textContent = "White WINS!";
+            }
         }
-    } else if (redScore === 0) {
-        divider.style.display = "none";
-        for (let i = 0; i < blackTurntext.length; i++) {            
-            blackTurntext[i].style.color = "black";
-            redTurnText[i].style.display = "none";
-            blackTurntext[i].textContent = "BLACK WINS!";
-        }
+
     }
-    changePlayer();
+    
 }
-*/
+
  //Switches player's turn
 function changePlayer() {
     if (turn) {
         turn = false;
+        resetPlayerPossibleMoves(); 
         for (let i = 0; i < whiteTurnText.length; i++) {
             whiteTurnText[i].style.color = "lightGrey";
             blackTurntext[i].style.color = "black";
-            console.log("Running Through Change Player Once")
         }
-        //removeEventListener();
-        //getPlayerPieces();
+        checkForWin();
+
+        
     } else {
         turn = true;
+        resetPlayerPossibleMoves();
         for (let i = 0; i < blackTurntext.length; i++) {
             blackTurntext[i].style.color = "lightGrey";
             whiteTurnText[i].style.color = "black";
-        }
-        //removeEventListener();
-        //getPlayerPieces();
+        } 
+        checkForWin();
     }
-    
-    //getPlayerPieces();
+    getPlayerPieces();
     
 }
 
