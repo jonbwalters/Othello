@@ -147,21 +147,17 @@ function getAvailableMoves() {
         j = col;
         while(j>=2 && board[row][j-1]!= 0 && board[row][j-1]%2 != player.colorId)
         {
-            // check to see if spot two to the left piece is open or not    
+            // check to see if next spot to the left is open or not    
             if ( board[row][j-2] == 0)
             {
                 player.possiblemoves[row][j-2] = 1;
                 cells[row*8+j-2].innerHTML = `<p class="validMoveHere" ></p>`;
-                j--;
+                break
                 
             }
-            else if (((board[row][j-1])%2) == ((board[row][j-2])%2) && board[row][j-2] !=0)
-            {
-                j--;
-            }   
             else
             {
-                break
+                j--;
             } 
         }
 
@@ -174,16 +170,12 @@ function getAvailableMoves() {
             {
                 player.possiblemoves[row][j+2] = 1;
                 cells[row*8+j+2].innerHTML = `<p class="validMoveHere" ></p>`;
-                j++;
+                break
                 
             }
-            else if (((board[row][j-1])%2) == ((board[row][j-2])%2) && board[row][j-2]!=0)
-            {
-                j++;
-            }    
             else
             {
-                break
+                j++;
             } 
         }
 
@@ -197,16 +189,12 @@ function getAvailableMoves() {
             {
                 player.possiblemoves[k-2][col] = 1;
                 cells[(k-2)*8+col].innerHTML = `<p class="validMoveHere" ></p>`;
-                k--;
+                break
                 
             }
-            else if (((board[k-1][col])%2) == ((board[k-2][col])%2) && board[k-2][col]!=0)
-            {
-                k--;
-            }   
             else
             {
-                break
+                k--;
             }  
         }
 
@@ -220,15 +208,11 @@ function getAvailableMoves() {
             {
                 player.possiblemoves[k+2][col] = 1;
                 cells[(k+2)*8+col].innerHTML = `<p class="validMoveHere" ></p>`;
-                k++; 
+                break
             }
-            else if (((board[k+1][col])%2) == ((board[k+2][col])%2) && board[k+2][col] !=0)
-            {
-                k++;
-            }    
             else
             {
-                break
+                k++;
             } 
         }
 
@@ -243,18 +227,13 @@ function getAvailableMoves() {
             {
                 player.possiblemoves[k-2][j-2] = 1;
                 cells[(k-2)*8+(j-2)].innerHTML = `<p class="validMoveHere" ></p>`;
-                k--;
-                j--;
+                break
                 
             }
-            else if (((board[k-1][j-1])%2) == ((board[k-2][j-2])%2) && board[k-2][j-2] != 0)
+            else
             {
                 k--;
                 j--;
-            } 
-            else
-            {
-                break
             }    
 
         }
@@ -270,18 +249,13 @@ function getAvailableMoves() {
             {
                 player.possiblemoves[k-2][j+2] = 1;
                 cells[(k-2)*8+(j+2)].innerHTML = `<p class="validMoveHere" ></p>`;
-                k--;
-                j++;
+                break
                 
             }
-            else if (((board[k-1][j+1])%2) == ((board[k-2][j+2])%2) && board[k-2][j+2] !=0 )
+            else
             {
                 k--;
                 j++;
-            } 
-            else
-            {
-                break
             }    
 
         }
@@ -297,18 +271,13 @@ function getAvailableMoves() {
             {
                 player.possiblemoves[k+2][j+2] = 1;
                 cells[(k+2)*8+(j+2)].innerHTML = `<p class="validMoveHere" ></p>`;
-                k++;
-                j++;
+                break
                 
             }
-            else if (((board[k+1][j+1])%2) == ((board[k+2][j+2])%2) && board[k+2][j+2] !=0 )
+            else
             {
                 k++;
                 j++;
-            } 
-            else
-            {
-                break
             }    
 
         }
@@ -324,18 +293,13 @@ function getAvailableMoves() {
             {
                 player.possiblemoves[k+2][j-2] = 1;
                 cells[(k+2)*8+(j-2)].innerHTML = `<p class="validMoveHere" ></p>`;
-                k++;
-                j--;
+                break
                 
             }
-            else if (((board[k+1][j-1])%2) == ((board[k+2][j-2])%2) && board[k+2][j-2] !=0 )
+            else
             {
                 k++;
                 j--;
-            } 
-            else
-            {
-                break
             }    
 
         }
@@ -493,23 +457,23 @@ function replaceMiddlePieces(row,col)
         } 
     }
 
-     //Check northWest
+    //Check northWest
     j = col;
     k = row;
     endcol = j;
     endrow = k;
     while(k>=2 && j>=2 && board[k-1][j-1]!= 0 && board[k-1][j-1]%2 != player.colorId)
     {
-        // check to see if spot two away is same color or not    
+        // check to see if spot two away is same color as player or not    
         if ( board[k-2][j-2]%2 == player.colorId && board[k-2][j-2]!=0 )
         {
             endrow = k-2;
             endcol = j-2;
+            m = col-1; 
             for (n=row-1; n>endrow; n--)
             {
-                m = col-1; 
                 changePiece(n,m);
-                m-=1;
+                m--;
             }
             break;    
         }
@@ -519,7 +483,7 @@ function replaceMiddlePieces(row,col)
             j--;
         } 
     }
-
+    
      //Check northEast
     j = col;
     k = row;
@@ -532,9 +496,9 @@ function replaceMiddlePieces(row,col)
         {
             endrow = k-2;
             endcol = j+2;
+            m = col+1;
             for (n=row-1; n>endrow; n--)
-            {
-                m = col+1; 
+            { 
                 changePiece(n,m);
                 m+=1;
             }
@@ -559,9 +523,9 @@ function replaceMiddlePieces(row,col)
         {
             endrow = k+2;
             endcol = j+2;
+            m = col+1; 
             for (n=row+1; n<endrow; n++)
             {
-                m = col+1; 
                 changePiece(n,m);
                 m+=1;
             }
@@ -586,9 +550,9 @@ function replaceMiddlePieces(row,col)
         {
             endrow = k+2;
             endcol = j-2;
+            m = col-1;
             for (n=row+1; n<endrow; n++)
-            {
-                m = col-1; 
+            { 
                 changePiece(n,m);
                 m-=1;
             }
