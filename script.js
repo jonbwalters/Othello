@@ -35,6 +35,8 @@ let blacksPieces = document.querySelectorAll("b")
 let possiblePlaces = document.querySelectorAll("p")
 const whiteTurnText = document.querySelectorAll(".white-turn-text");
 const blackTurntext = document.querySelectorAll(".black-turn-text");
+const whiteScoretext = document.querySelectorAll(".white-score-text")
+const blackScoretext = document.querySelectorAll(".black-score-text")
 const divider = document.querySelector("#divider")
 let nextblackPieceId = 5;
 let nextwhitePieceId = 6;
@@ -74,6 +76,7 @@ function getPlayerPieces() {
         playerPieces = blacksPieces;
     }
     resetPlayerPossibleMoves()
+    checkForWin()
     giveCellsClick()
 }
 
@@ -141,7 +144,7 @@ function getAvailableMoves() {
         row = indices[0];
         col = indices[1];
 
-        console.log("Row: " + row+ "| Column: " + col);
+        //console.log("Row: " + row+ "| Column: " + col);
         //check the eight possible directions for opposing color's pieces
         
         //First Check left
@@ -562,14 +565,18 @@ function replaceMiddlePieces(row,col)
             j--;
         } 
     }
+}
 
-
+function stopPlay()
+{
 
 }
 
 //Checks for a win
 function checkForWin() {
-    if( (blacksPieces.length+whitesPieces.length) == 64 || possiblePlaces.length == 0)
+    
+    console.log(blacksPieces.length+whitesPieces.length+ "possiblePlace.length = " + possiblePlaces.length)
+    if( ((blacksPieces.length+whitesPieces.length) == 64) || (possiblePlaces.length == 0) )
     {
         if (blacksPieces.length > whitesPieces.length)
         {
@@ -579,7 +586,7 @@ function checkForWin() {
                 whiteTurnText[i].style.display = "none";
                 blackTurntext[i].textContent = "BLACK WINS!";
             }
-
+            
         }
         else if(blacksPieces.length < whitesPieces.length)
         {
@@ -590,33 +597,40 @@ function checkForWin() {
             whiteTurnText[i].textContent = "White WINS!";
             }
         }
-        console.log(blacksPieces.length+whitesPieces.length+ "possiblePlace.length = " + possiblePlaces.length)
     }
-    
-    
+}
+
+function updateScoreHTML()
+{
+     // update scores on page
+     for (let i = 0; i < whiteScoretext.length; i++) {            
+        whiteScoretext[i].textContent = "White's Score: "+whitesPieces.length;
+        }
+    for (let i = 0; i < blackScoretext.length; i++) {            
+    blackScoretext[i].textContent = "Black's Score: "+blacksPieces.length;
+    }
 }
 
  //Switches player's turn
 function changePlayer() {
     if (turn) {
         turn = false;
-        resetPlayerPossibleMoves(); 
         for (let i = 0; i < whiteTurnText.length; i++) {
             whiteTurnText[i].style.color = "black";
             blackTurntext[i].style.color = "#a3e4a6";
         }
-        checkForWin();
+        //checkForWin();
 
         
     } else {
         turn = true;
-        resetPlayerPossibleMoves();
         for (let i = 0; i < blackTurntext.length; i++) {
             blackTurntext[i].style.color = "black";
             whiteTurnText[i].style.color = "#a3e4a6";
         } 
-        checkForWin();
+        //checkForWin();
     }
+    updateScoreHTML();
     getPlayerPieces();
     
 }

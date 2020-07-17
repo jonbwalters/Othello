@@ -56,6 +56,20 @@ td {
     color: rgb(0, 0, 0);
 }
 
+.white-score-text {
+    text-align: center;
+    font-family: "open sans";
+    font-size: 35px;
+    color: rgb(165, 163, 163);
+}
+
+.black-score-text {
+    text-align: center;
+    font-family: "open sans";
+    font-size: 35px;
+    color: rgb(165, 163, 163);
+}
+
 .black-piece {
     width: 20px;
     height: 20px;
