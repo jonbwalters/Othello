@@ -118,6 +118,7 @@ function resetPlayerPossibleMoves()
         possiblePlaces[i].remove();
         //possiblePlaces[i].HTML = '<td></td>';
     }
+
     possiblePlaces = document.querySelector("p")
     getAvailableMoves()
     
@@ -318,19 +319,16 @@ function placePiece(row, col){
         //console.log("THIS IS CELL:" + cells[row*8+col])
         whitesPieces = document.querySelectorAll("w");
         board[row][col] = nextwhitePieceId;
-        nextwhitePieceId+=2;
-        replaceMiddlePieces(row,col)
-        changePlayer();
-        
+        nextwhitePieceId+=2;  
     }
     else{
         cells[row*8+col].innerHTML = '<b class="black-piece" id="'+nextblackPieceId+'"></b>';
         blacksPieces = document.querySelectorAll("b");
         board[row][col] = nextblackPieceId;
         nextblackPieceId+=2;
-        replaceMiddlePieces(row,col)
-        changePlayer();
     } 
+    replaceMiddlePieces(row,col)
+    changePlayer();
 
 }
 
@@ -577,7 +575,7 @@ function checkForWin() {
         {
             divider.style.display = "none";
             for (let i = 0; i < blackTurntext.length; i++) {            
-                blackTurntext[i].style.color = "black";
+                blackTurntext[i].style.color = "white";
                 whiteTurnText[i].style.display = "none";
                 blackTurntext[i].textContent = "BLACK WINS!";
             }
@@ -587,13 +585,14 @@ function checkForWin() {
         {
             divider.style.display = "none";
             for (let i = 0; i < blackTurntext.length; i++) {            
-                whiteTurnText[i].style.color = "black";
+                whiteTurnText[i].style.color = "white";
             blackTurntext[i].style.display = "none";
             whiteTurnText[i].textContent = "White WINS!";
             }
         }
-
+        console.log(blacksPieces.length+whitesPieces.length+ "possiblePlace.length = " + possiblePlaces.length)
     }
+    
     
 }
 
@@ -603,8 +602,8 @@ function changePlayer() {
         turn = false;
         resetPlayerPossibleMoves(); 
         for (let i = 0; i < whiteTurnText.length; i++) {
-            whiteTurnText[i].style.color = "lightGrey";
-            blackTurntext[i].style.color = "black";
+            whiteTurnText[i].style.color = "black";
+            blackTurntext[i].style.color = "#a3e4a6";
         }
         checkForWin();
 
@@ -613,8 +612,8 @@ function changePlayer() {
         turn = true;
         resetPlayerPossibleMoves();
         for (let i = 0; i < blackTurntext.length; i++) {
-            blackTurntext[i].style.color = "lightGrey";
-            whiteTurnText[i].style.color = "black";
+            blackTurntext[i].style.color = "black";
+            whiteTurnText[i].style.color = "#a3e4a6";
         } 
         checkForWin();
     }

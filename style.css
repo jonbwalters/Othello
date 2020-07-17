@@ -7,6 +7,7 @@ main {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+    background-color: #1c1d1c; 
     height: 100vh;
 }
 
@@ -43,7 +44,7 @@ td {
 
 .white-turn-text {
     text-align: center;
-    color: black;
+    color: rgb(163, 236, 173);
     font-family: "open sans";
     font-size: 55px;
 }
@@ -52,7 +53,7 @@ td {
     text-align: center;
     font-family: "open sans";
     font-size: 55px;
-    color: lightgray;
+    color: rgb(0, 0, 0);
 }
 
 .black-piece {
