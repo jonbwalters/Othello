@@ -1,4 +1,10 @@
-/*----------- Game State Data ----------*/
+/*Array to store the game state
+Got the game working over the summer, but had wrong win if player ran out of moves
+turns out you pass if you don't have any moves.
+Game only ends if both players cannot move
+White will be the maximizing player for the minimax algorithm*/
+
+
 
 const board = [
     [0,0,0,0,0,0,0,0],
@@ -32,6 +38,8 @@ let findPiece = function (pieceId) {
 const cells = document.querySelectorAll("td");
 let whitesPieces = document.querySelectorAll("w");
 let blacksPieces = document.querySelectorAll("b")
+let whitePossiblePlaces;
+let blackPossiblePlaces;
 let possiblePlaces = document.querySelectorAll("p")
 const whiteTurnText = document.querySelectorAll(".white-turn-text");
 const blackTurntext = document.querySelectorAll(".black-turn-text");
@@ -43,14 +51,14 @@ let nextwhitePieceId = 6;
 
 
 // player properties
-let turn = true;
+let turn = true;   /*white will start the game*/
 let whiteScore = 2;
 let blackScore = 2;
 let playerPieces;
 
 // players whose turn it is properties
-let player = {
-    colorId: null,
+let whitePlayer = {
+    colorId: 0,
     pieces:  null,
     //0 for false and 1 for true is space is a possible move for the current color
     possiblemoves: [
@@ -62,7 +70,26 @@ let player = {
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0]
-    ]
+    ],
+    numberOfPossible: 4
+}
+
+let blackPlayer = 
+{
+    colorId: 1,
+    pieces:  null,
+    //0 for false and 1 for true is space is a possible move for the current color
+    possiblemoves: [
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0]
+    ],
+    numberOfPossible: 4
 }
 
 
@@ -71,17 +98,44 @@ let player = {
 function getPlayerPieces() {
     if (turn) {
         playerPieces = whitesPieces;
+        resetPossibleMoves()
     } 
     else {
         playerPieces = blacksPieces;
+        resetPossibleMoves()
     }
-    resetPlayerPossibleMoves()
-    checkForWin()
-    giveCellsClick()
+    /*resetPlayerPossibleMoves()*/
+    checkForWin();
+    
+    if( turn && possiblePlaces.length != 0)
+    /* Let White Player make a Move */
+    {
+        giveCellsClick()
+    }
+    else if( possiblePlaces.length != 0)
+    /* Let AI make a move */
+    {
+        setTimeout(makeRandomMove,1000);
+    }
+    else if (possiblePlaces.length == 0 && blacksPieces.length + whitesPieces.length < 64 && !(blackPlayer.numberOfPossible == 0 && whitePlayer.numberOfPossible == 0))
+    {
+        /* if current player cannot move, switch to other player. */
+        setTimeout(changePlayer(), 2000);
+    }
+    
+    
 }
 
 // initialize event listeners on cells
 function giveCellsClick() {
+    if(turn)
+    {
+        player = whitePlayer;
+    }
+    else
+    {
+        player = blackPlayer;
+    }
     cells.forEach(cell => {
         cell.addEventListener('click', () =>
         {    
@@ -96,17 +150,11 @@ function giveCellsClick() {
 }
 
 // resets color turn properties
-function resetPlayerPossibleMoves() 
+function resetPossibleMoves() 
 {
-    if(turn)
-    {
-        player.colorId = 0;   //0 for white
-    }
-    else{
-        player.colorId = 1;   //1 for black
-    }
     //0 for false and 1 for true is space is a possible move for the current color
-    player.possiblemoves = [
+    
+    whitePlayer.possiblemoves = [
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
@@ -116,27 +164,71 @@ function resetPlayerPossibleMoves()
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0]
     ]
+    blackPlayer.possiblemoves = [
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0]
+    ]
+
+    removeHTMLpossiblePlace();
+
+    /*possiblePlaces = document.querySelector("p")*/
+    if (turn)
+    {
+        blackPossiblePlaces = getAvailableMoves(board, "black");
+        whitePossiblePlaces = getAvailableMoves(board, "white");
+        possiblePlaces = whitePossiblePlaces;     
+    }
+    else
+    {
+        whitePossiblePlaces = getAvailableMoves(board, "white");
+        blackPossiblePlaces = getAvailableMoves(board, "black");
+        possiblePlaces = blackPossiblePlaces;
+    }
+}
+
+function removeHTMLpossiblePlace()
+{
     for(i=0; i<possiblePlaces.length; i++)
     {
         possiblePlaces[i].remove();
         //possiblePlaces[i].HTML = '<td></td>';
     }
-
-    possiblePlaces = document.querySelector("p")
-    getAvailableMoves()
-    
 }
 
 
 // gets the moves that the selected piece can make
 // loop through all pieces of the current color and find possible moves
-function getAvailableMoves() {
+function getAvailableMoves(board, color) {
     // loop through the pieces of the current player
-    
-    for (i = 0; i<playerPieces.length; i++)
+    if (color == "white")
+    {
+        player = whitePlayer
+        pieces = whitesPieces;
+        playerId = 0; 
+        
+    }
+    else
+    {
+        player = blackPlayer
+        pieces = blacksPieces;
+        playerId = 1; 
+    }
+    changeHTML = false;
+    if(turn && playerId == 0 || !turn && playerId == 1)
+    {
+        changeHTML = true;
+    }
+
+    for (i = 0; i<pieces.length; i++)
     {
         //console.log(i)
-        cell = playerPieces[i];
+        cell = pieces[i];
         
         // get the location of the piece in the gameboard matrix
 
@@ -149,15 +241,17 @@ function getAvailableMoves() {
         
         //First Check left
         j = col;
-        while(j>=2 && board[row][j-1]!= 0 && board[row][j-1]%2 != player.colorId)
+        while(j>=2 && board[row][j-1]!= 0 && board[row][j-1]%2 != playerId)
         {
             // check to see if next spot to the left is open or not    
             if ( board[row][j-2] == 0)
             {
                 player.possiblemoves[row][j-2] = 1;
-                cells[row*8+j-2].innerHTML = `<p class="validMoveHere" ></p>`;
+                if(changeHTML)
+                {
+                    cells[row*8+j-2].innerHTML = `<p class="validMoveHere" ></p>`;
+                }
                 break
-                
             }
             else
             {
@@ -167,15 +261,17 @@ function getAvailableMoves() {
 
         //Next Check Right
         j = col;
-        while(j<6 && board[row][j+1]!=0 && board[row][j+1]%2 != player.colorId)
+        while(j<6 && board[row][j+1]!=0 && board[row][j+1]%2 != playerId)
         {
             // check to see if spot two to the left piece is open or not    
             if ( board[row][j+2] == 0)
             {
                 player.possiblemoves[row][j+2] = 1;
-                cells[row*8+j+2].innerHTML = `<p class="validMoveHere" ></p>`;
-                break
-                
+                if(changeHTML)
+                {
+                    cells[row*8+j+2].innerHTML = `<p class="validMoveHere" ></p>`;
+                }
+                break  
             }
             else
             {
@@ -185,16 +281,17 @@ function getAvailableMoves() {
 
         //check upwards 
         k = row;
-        while( k>=2 && board[k-1][col]!=0 && board[k-1][col]%2 != player.colorId)
+        while( k>=2 && board[k-1][col]!=0 && board[k-1][col]%2 != playerId)
         {
-            
             // check to see if spot two up is open or not   
             if ( board[k-2][col] == 0)
             {
                 player.possiblemoves[k-2][col] = 1;
-                cells[(k-2)*8+col].innerHTML = `<p class="validMoveHere" ></p>`;
-                break
-                
+                if(changeHTML)
+                {
+                    cells[(k-2)*8+col].innerHTML = `<p class="validMoveHere" ></p>`;
+                }
+                break 
             }
             else
             {
@@ -204,14 +301,16 @@ function getAvailableMoves() {
 
         // check downards
         k = row;
-        while(k<6 && board[k+1][col] !=0 && board[k+1][col]%2 != player.colorId )
+        while(k<6 && board[k+1][col] !=0 && board[k+1][col]%2 != playerId )
         {
-            
             // check to see if spot two down is open or not   
             if ( board[k+2][col] == 0)
             {
                 player.possiblemoves[k+2][col] = 1;
-                cells[(k+2)*8+col].innerHTML = `<p class="validMoveHere" ></p>`;
+                if(changeHTML)
+                {
+                    cells[(k+2)*8+col].innerHTML = `<p class="validMoveHere" ></p>`;
+                }
                 break
             }
             else
@@ -223,80 +322,83 @@ function getAvailableMoves() {
         // check NorthWest
         k = row;
         j = col;
-        while(k>=2 && j >= 2 && board[k-1][j-1]!=0 && board[k-1][j-1]%2 != player.colorId)
+        while(k>=2 && j >= 2 && board[k-1][j-1]!=0 && board[k-1][j-1]%2 != playerId)
         {
-            
             // check to see if spot two northwest is open or not   
             if ( board[k-2][j-2] == 0)
             {
                 player.possiblemoves[k-2][j-2] = 1;
-                cells[(k-2)*8+(j-2)].innerHTML = `<p class="validMoveHere" ></p>`;
-                break
-                
+                if(changeHTML)
+                {
+                    cells[(k-2)*8+(j-2)].innerHTML = `<p class="validMoveHere" ></p>`;
+                }
+                break 
             }
             else
             {
                 k--;
                 j--;
-            }    
-
+            }   
         }
 
         // check NorthEast
         k = row;
         j = col;
-        while( k>=2 && j < 6 && board[k-1][j+1]!=0 && board[k-1][j+1]%2 != player.colorId)
+        while( k>=2 && j < 6 && board[k-1][j+1]!=0 && board[k-1][j+1]%2 != playerId)
         {
-            
             // check to see if spot two northwest is open or not   
             if ( board[k-2][j+2] == 0)
             {
                 player.possiblemoves[k-2][j+2] = 1;
-                cells[(k-2)*8+(j+2)].innerHTML = `<p class="validMoveHere" ></p>`;
-                break
-                
+                if(changeHTML)
+                {
+                    cells[(k-2)*8+(j+2)].innerHTML = `<p class="validMoveHere" ></p>`;
+                }
+                break  
             }
             else
             {
                 k--;
                 j++;
             }    
-
         }
 
         // check SouthEast
         k = row;
         j = col;
-        while(k<6 && j < 6 && board[k+1][j+1]!=0 && board[k+1][j+1]%2 != player.colorId )
+        while(k<6 && j < 6 && board[k+1][j+1]!=0 && board[k+1][j+1]%2 != playerId )
         {
             
             // check to see if spot two northwest is open or not   
             if ( board[k+2][j+2] == 0)
             {
                 player.possiblemoves[k+2][j+2] = 1;
-                cells[(k+2)*8+(j+2)].innerHTML = `<p class="validMoveHere" ></p>`;
+                if(changeHTML)
+                {
+                    cells[(k+2)*8+(j+2)].innerHTML = `<p class="validMoveHere" ></p>`;
+                }
                 break
-                
             }
             else
             {
                 k++;
                 j++;
             }    
-
         }
 
         // check SouthWest
         k = row;
         j = col;
-        while(k<6 && j >= 2 && board[k+1][j-1]!=0 && board[k+1][j-1]%2 != player.colorId )
+        while(k<6 && j >= 2 && board[k+1][j-1]!=0 && board[k+1][j-1]%2 != playerId )
         {
-            
             // check to see if spot two northwest is open or not   
             if ( board[k+2][j-2] == 0)
             {
                 player.possiblemoves[k+2][j-2] = 1;
-                cells[(k+2)*8+(j-2)].innerHTML = `<p class="validMoveHere" ></p>`;
+                if(changeHTML)
+                {
+                    cells[(k+2)*8+(j-2)].innerHTML = `<p class="validMoveHere" ></p>`;
+                }
                 break
                 
             }
@@ -305,12 +407,45 @@ function getAvailableMoves() {
                 k++;
                 j--;
             }    
-
         }
-
     }
-    possiblePlaces = document.querySelectorAll("p")
-            
+
+    let Places = document.querySelectorAll("p")
+    whitePlayer.numberOfPossible = getPossibleCount(whitePlayer.possiblemoves)
+    blackPlayer.numberOfPossible = getPossibleCount(blackPlayer.possiblemoves)
+    return Places  
+}
+
+function addHoveListener(){
+    for(i=0; i<possiblePlaces.length; i++)
+    {
+        possiblePlaces[i].addEventListener("mouseover", possiblePlaces[i].innerHTML);
+    }
+}
+
+function makeRandomMove(){
+    
+    k = 1 + Math.floor(Math.random()* (possiblePlaces.length-1));   /* we will randomly select a move to be made for now*/
+    console.log(k)
+    i=0;  /*row number*/
+    j=-1; /*coumn number*/
+    count = 0;
+        while(count < k)
+        {
+            j++
+            if(j > 0 && j%8 == 0)
+            {
+                i++;
+                j=0;
+            }
+            if (player.possiblemoves[i][j] == 1)
+            {
+            count++;
+            }
+        }
+    console.log(k +" Piece to go in " +i+", " +j)
+    placePiece(i,j);
+
 }
 
 // testing placement of pieces onto the board
@@ -331,7 +466,7 @@ function placePiece(row, col){
         nextblackPieceId+=2;
     } 
     replaceMiddlePieces(row,col)
-    changePlayer();
+    changePlayer(true);
 
 }
 
@@ -567,16 +702,152 @@ function replaceMiddlePieces(row,col)
     }
 }
 
-function stopPlay()
+function MiniMax(board, depth, maximizingPlayer)
 {
+    /* board is the state of the board, depth is the depth in the tree, and maximizingPlayer is a boolean that should be true if white
+    and false is black */
+    if(depth == 0 || isWinningPosition(board, maximizingPlayer))
+    {
+        return Heuristic(board);
+    }
+}
 
+function isWinningPosition(board, player)
+{
+    whitePieceCount = getPieces(board, "white");
+    blackPieceCount = getPieces(board, "black");
+
+    whitePossibleMoveCount = whitePossiblePlaces.length;
+    blackPossibleMoveCount = blackPossiblePlaces.length;
+    
+    if(whitePieceCount + blackPieceCount == 64 || (whitePossibleMoveCount + blackPossibleMoveCount) == 0)
+    {
+        if (player == "white" && whitePieceCount > blackPieceCount)
+        {
+            return true;
+        }
+        else if(player == "white" && whitePieceCount <= blackPieceCount)
+        {
+            return false;
+        }
+        else if(player == "black" && whitePieceCount < blackPieceCount)
+        {
+            return true;
+        }
+        else if(player == "black" && whitePieceCount >= blackPieceCount)
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+
+/*console.log(isWinningPosition(board, "white"))*/
+
+function Heuristic(board)
+{
+    whiteCorners = getCorners(board, "white");
+    blackCorners = getCorners(board, "black");
+
+    whitePieceCount = getPieces(board, "white");
+    blackPieceCount = getPieces(board, "black")
+}
+
+function getCorners(board, color)
+{
+    count = 0;
+    if(color == "white")
+    {
+        if(board[0][0]%2 == 0 && board[0][0] != 0)
+        {
+            count++;
+        }
+        if(board[0][7]%2 == 0 && board[0][7] != 0)
+        {
+            count++;
+        }
+        if(board[7][0]%2 == 0 && board[7][0] != 0)
+        {
+            count++;
+        }
+        if(board[7][7]%2 == 0 && board[7][7] != 0)
+        {
+            count++;
+        }
+    }
+    if(color == "black")
+    {
+        if(board[0][0]%2 == 1)
+        {
+            count++;
+        }
+        if(board[0][7]%2 == 1)
+        {
+            count++;
+        }
+        if(board[7][0]%2 == 1)
+        {
+            count++;
+        }
+        if(board[7][7]%2 == 1)
+        {
+            count++;
+        }
+    }
+    return count;
+}
+/*console.log(getCorners(board, "white"))*/
+
+function getPieces(board, color)
+{
+    count = 0;
+    for( let i = 0; i < 8; i++)
+    {
+        for (let j = 0; j< 8 ; j++)
+        {
+            if(color == "white")
+            {
+                if(board[i][j]%2 == 0 && board[i][j] != 0)
+                {
+                    count++;
+                }
+            }
+            else{
+                if(board[i][j]%2 == 1)
+                {
+                    count++;
+                }
+            }
+        }
+    }
+    return count;
+}
+
+function getPossibleCount(PossibleBoard)
+{
+    count = 0;
+    for( let i = 0; i < 8; i++)
+    {
+        for (let j = 0; j< 8 ; j++)
+        {
+            if(PossibleBoard[i][j] == 1)
+            {
+                count++;
+            }
+        }
+    }
+    return count;
 }
 
 //Checks for a win
-function checkForWin() {
-    
-    console.log(blacksPieces.length+whitesPieces.length+ "possiblePlace.length = " + possiblePlaces.length)
-    if( ((blacksPieces.length+whitesPieces.length) == 64) || (possiblePlaces.length == 0) )
+function checkForWin() 
+{
+    /*console.log(blacksPieces.length+whitesPieces.length+ "possiblePlace.length = " + possiblePlaces.length)*/
+    /* Here we check to see if the gameboard is full */
+    if( (blacksPieces.length + whitesPieces.length) == 64 || (whitePlayer.numberOfPossible == 0 && blackPlayer.numberOfPossible == 0) )
     {
         if (blacksPieces.length > whitesPieces.length)
         {
@@ -598,41 +869,101 @@ function checkForWin() {
             }
         }
     }
+    /* Here we check to see if neither player can move. */
+    
+    /* if( possiblePlaces.length == 0 )  
+    {
+        /*switch to other player POV to check possible moves
+        turn = !turn;
+        if (turn) {
+            playerPieces = whitesPieces;
+        } 
+        else {
+            playerPieces = blacksPieces;
+        }
+        resetPossibleMoves();
+        if( possiblePlaces.length == 0 )
+        {
+            if (blacksPieces.length > whitesPieces.length)
+            {
+                divider.style.display = "none";
+                for (let i = 0; i < blackTurntext.length; i++) {            
+                    blackTurntext[i].style.color = "white";
+                    whiteTurnText[i].style.display = "none";
+                    blackTurntext[i].textContent = "BLACK WINS!";
+                }
+            
+            }
+            else if(blacksPieces.length < whitesPieces.length)
+            {
+                divider.style.display = "none";
+                for (let i = 0; i < blackTurntext.length; i++) {            
+                    whiteTurnText[i].style.color = "white";
+                blackTurntext[i].style.display = "none";
+                whiteTurnText[i].textContent = "White WINS!";
+                }
+            }
+            else
+            {
+                divider.style.display = "none";
+                for (let i = 0; i < blackTurntext.length; i++) 
+                {            
+                    whiteTurnText[i].style.color = "white";
+                blackTurntext[i].style.display = "none";
+                whiteTurnText[i].textContent = "DRAW";
+           `` }
+        ``}
+        }
+        /*switch back  to original player
+        turn = !turn;
+        if (turn) {
+            playerPieces = whitesPieces;
+        } 
+        else {
+            playerPieces = blacksPieces;
+        }
+        resetPossibleMoves();
+    } */
 }
 
 function updateScoreHTML()
 {
      // update scores on page
      for (let i = 0; i < whiteScoretext.length; i++) {            
-        whiteScoretext[i].textContent = "White's Score: "+whitesPieces.length;
+        whiteScoretext[i].textContent = "White's Score: "+ whitesPieces.length;
         }
     for (let i = 0; i < blackScoretext.length; i++) {            
-    blackScoretext[i].textContent = "Black's Score: "+blacksPieces.length;
+    blackScoretext[i].textContent = "Black's Score: "+ blacksPieces.length;
     }
 }
 
  //Switches player's turn
-function changePlayer() {
-    if (turn) {
+function changePlayer() 
+{
+    if (turn) 
+    {
         turn = false;
-        for (let i = 0; i < whiteTurnText.length; i++) {
+        for (let i = 0; i < whiteTurnText.length; i++) 
+        {
             whiteTurnText[i].style.color = "black";
-            blackTurntext[i].style.color = "#a3e4a6";
-        }
-        //checkForWin();
+            blackTurntext[i].style.color = "#f7f8f7";
+        }  
 
         
-    } else {
+        
+    } 
+    else
+     {
         turn = true;
         for (let i = 0; i < blackTurntext.length; i++) {
             blackTurntext[i].style.color = "black";
-            whiteTurnText[i].style.color = "#a3e4a6";
+            whiteTurnText[i].style.color = "#f7f8f7";
         } 
-        //checkForWin();
+        
     }
     updateScoreHTML();
     getPlayerPieces();
     
 }
 
-getPlayerPieces();
+getPlayerPieces()

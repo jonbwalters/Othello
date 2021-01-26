@@ -6,7 +6,7 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    align-items: center;
+    align-items: left;
     background-color: #1c1d1c; 
     height: 100vh;
 }
@@ -27,47 +27,61 @@ div {
 
 
 
-
 td {
     text-align: center;
     background-color: #4b9b4f; 
-    width: 65px;
-    height: 65px;
+    width: 55px;
+    height: 55px;
 }
 
 .validMoveHere {
     text-align: center;
     background-color: #a3e4a6;
-    width: 65px;
-    height: 65px;
+    width: 55px;
+    height: 55px;
+    
 }
+
+p {
+    background-color: #a3e4a6;
+    transition: background-color .5s;
+  } 
+  
+    p:hover {
+    background-color: rgb(240, 180, 225);
+  }
+
+
+
+
+
 
 .white-turn-text {
     text-align: center;
-    color: rgb(163, 236, 173);
+    color: #f7f8f7;
     font-family: "open sans";
-    font-size: 55px;
+    font-size: 35px;
 }
 
 .black-turn-text {
     text-align: center;
     font-family: "open sans";
-    font-size: 55px;
+    font-size: 35px;
     color: rgb(0, 0, 0);
 }
 
 .white-score-text {
     text-align: center;
     font-family: "open sans";
-    font-size: 35px;
-    color: rgb(165, 163, 163);
+    font-size: 25px;
+    color: rgb(199, 197, 197);
 }
 
 .black-score-text {
     text-align: center;
     font-family: "open sans";
-    font-size: 35px;
-    color: rgb(165, 163, 163);
+    font-size: 25px;
+    color: rgb(199, 197, 197);
 }
 
 .black-piece {
@@ -77,6 +91,7 @@ td {
     background-color: black;
     border: 1px solid white;
     border-radius: 50px;
+    transition: background-color .5s;
 }
 
 .white-piece {
@@ -86,6 +101,7 @@ td {
     background-color: white;
     border: 1px solid black;
     border-radius: 50px;
+    transition: background-color .5s;
 }
 
 
