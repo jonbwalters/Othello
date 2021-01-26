@@ -7,7 +7,7 @@ main {
     flex-direction: column;
     justify-content: space-between;
     align-items: left;
-    background-color: #1c1d1c; 
+    background-color: #686968; 
     height: 100vh;
 }
 
@@ -67,7 +67,7 @@ p {
     text-align: center;
     font-family: "open sans";
     font-size: 35px;
-    color: rgb(0, 0, 0);
+    color: #5e5d5d;
 }
 
 .white-score-text {

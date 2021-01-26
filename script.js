@@ -945,7 +945,7 @@ function changePlayer()
         turn = false;
         for (let i = 0; i < whiteTurnText.length; i++) 
         {
-            whiteTurnText[i].style.color = "black";
+            whiteTurnText[i].style.color = "#5e5d5d";
             blackTurntext[i].style.color = "#f7f8f7";
         }  
 
@@ -956,7 +956,7 @@ function changePlayer()
      {
         turn = true;
         for (let i = 0; i < blackTurntext.length; i++) {
-            blackTurntext[i].style.color = "black";
+            blackTurntext[i].style.color = "#5e5d5d";
             whiteTurnText[i].style.color = "#f7f8f7";
         } 
         
