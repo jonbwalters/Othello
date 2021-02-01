@@ -675,7 +675,7 @@ function Heuristic(board)
         let whiteScore = getScore(board, "white");
         let blackScore = getScore(board, "black");
 
-        return (whiteCount - blackCount)/(whiteCount+blackCount+1)*4 + (whiteScore - blackScore)/(whiteScore + blackScore + 1) + (whiteCornerCount - blackCornerCount)/(whiteCornerCount + blackCornerCount + 1)*100;
+        return (whiteCount - blackCount)/(whiteCount+blackCount+1)*4 + (whiteScore - blackScore)/(whiteScore + blackScore + 1) + (whiteCornerCount - blackCornerCount)/(whiteCornerCount + 1)*10000;
 
     }
 
