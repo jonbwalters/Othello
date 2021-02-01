@@ -52,7 +52,18 @@ p {
   }
 
 
-
+.refresh-button
+{
+    background-color: #b3b6b3; 
+}
+.debug-button
+{
+    background-color: #b3b6b3; 
+}
+.prune-button
+{
+    background-color: #b3b6b3; 
+}
 
 
 
