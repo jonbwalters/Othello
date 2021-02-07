@@ -108,7 +108,7 @@ function changeMiddlePieces(row, col, board, color)
          if ( board[row][j-2] == colorId && board[row][j-2] != 0 )
          {
              endcol = j-2;
-             for (n=col-1; n>endcol; n--)
+             for (let n=col-1; n>endcol; n--)
              {
                  changePiece(row, n, board, color);
              }
@@ -132,7 +132,7 @@ function changeMiddlePieces(row, col, board, color)
          if ( board[row][j+2] == colorId && board[row][j+2] != 0)
          {
              endcol = j+2;
-             for (n=col+1; n<endcol; n++)
+             for (let n = col+1; n<endcol; n++)
              {
                  changePiece(row, n, board, color);
              }
@@ -156,7 +156,7 @@ function changeMiddlePieces(row, col, board, color)
          if ( board[k+2][col] == colorId && board[k+2][col]!=0)
          {
              endrow = k+2;
-             for (n=row+1; n<endrow; n++)
+             for (let n = row+1; n < endrow; n++)
              {
                  changePiece(n, col, board, color);
              }
@@ -180,7 +180,7 @@ function changeMiddlePieces(row, col, board, color)
         if ( board[k-2][col] == colorId &&  board[k-2][col]!=0 )
         {
             endrow = k-2;
-            for (n=row-1; n>endrow; n--)
+            for (let n = row-1; n > endrow; n--)
             {
                 changePiece(n, col, board, color);
             }
@@ -206,7 +206,7 @@ function changeMiddlePieces(row, col, board, color)
             endrow = k-2;
             endcol = j-2;
             m = col-1; 
-            for (n=row-1; n>endrow; n--)
+            for (let n = row-1; n > endrow; n--)
             {
                 changePiece(n, m, board, color);
                 m--;
@@ -233,7 +233,7 @@ function changeMiddlePieces(row, col, board, color)
             endrow = k-2;
             endcol = j+2;
             m = col+1;
-            for (n=row-1; n>endrow; n--)
+            for (let n = row-1; n > endrow; n--)
             { 
                 changePiece(n, m, board, color);
                 m+=1;
@@ -260,7 +260,7 @@ function changeMiddlePieces(row, col, board, color)
             endrow = k+2;
             endcol = j+2;
             m = col+1; 
-            for (n=row+1; n<endrow; n++)
+            for (let n = row+1; n < endrow; n++)
             {
                 changePiece(n, m, board, color);
                 m+=1;
@@ -287,7 +287,7 @@ function changeMiddlePieces(row, col, board, color)
             endrow = k+2;
             endcol = j-2;
             m = col-1;
-            for (n=row+1; n<endrow; n++)
+            for (let n = row+1; n < endrow; n++)
             { 
                 changePiece(n, m, board, color);
                 m-=1;
@@ -391,9 +391,9 @@ function getScore(board, color)
     {
         colorId = "b";
     }
-    for(i = 0; i < 8; i++)
+    for(let i = 0; i < 8; i++)
     {
-        for(j = 0; j < 8; j++)
+        for(let j = 0; j < 8; j++)
         {
             if (board[i][j] == colorId)
             {
@@ -602,6 +602,7 @@ function getPossibleCount(PossibleBoard)
 // initialize event listeners on cells
 function giveCellsClick() {
     console.log("Give Cells Click")
+    let player;
     if(WhitesTurn)
     {
         player = whitePlayer;
@@ -613,8 +614,8 @@ function giveCellsClick() {
     cells.forEach(cell => {
         cell.addEventListener('click', () =>
         {    
-            i = cell.closest('tr').rowIndex;
-            j = cell.cellIndex;
+            let i = cell.closest('tr').rowIndex;
+            let j = cell.cellIndex;
             if(board[i][j] == 0 && player.possiblemoves[i][j] == "p")
             { 
                 if(WhitesTurn)
@@ -662,7 +663,7 @@ function Heuristic(board)
     }
     else if(isWinningBoard(board, "black"))
     {
-        return -1000000;
+        return -10000000;
     }
     else
     {
@@ -675,8 +676,8 @@ function Heuristic(board)
         let whiteScore = getScore(board, "white");
         let blackScore = getScore(board, "black");
 
-        return (whiteCount - blackCount)/(whiteCount+blackCount+1)*4 + (whiteScore - blackScore)/(whiteScore + blackScore + 1) + (whiteCornerCount - blackCornerCount)/(whiteCornerCount + 1)*10000;
-
+        return ((whiteCount - blackCount)/(whiteCount+1)*4 + (whiteScore - blackScore)/(whiteScore + 1) + (whiteCornerCount - blackCornerCount)/(whiteCornerCount + 1)*20);
+        /*return( (whiteCornerCount-blackCornerCount)/4 * 10)*/
     }
 
 }
@@ -690,7 +691,7 @@ function isGameOver(board)
     whiteMoveCount = getPossibleCount(getPossibleMoves(board, "white"));
     let blackMoveCount;
     blackMoveCount = getPossibleCount(getPossibleMoves(board, "black"));
-    if( (whiteMoveCount == 0 && blackMoveCount == 0) || (whiteScore + blackScore == 64))
+    if( (whiteMoveCount == 0 && blackMoveCount == 0) || (whiteScore + blackScore == 64) || whiteScore == 0 || blackScore == 0 )
     {
         return true;
     }
@@ -733,6 +734,7 @@ function isWinningBoard(board, color)
 
 function makeAImove()
 {
+    let minimaxmove;
     if (HumanIsWhite)
     {
         if (blackPlayer.numberOfPossible > 1)
@@ -799,24 +801,26 @@ function miniMax(board, depth, maximizingPlayer)
     {
         /*console.log("reached depth 0")
         console.log(Heuristic(board));*/
+        /*console.log(board)*/
         return [Heuristic(board), -1, -1];
     }
     else if(maximizingPlayer)
     {
-        gameBoard = copyBoard(board);
+        
         maxEval = -1000000000000000;
         /* loop through every move and recursively call miniMax */
         let i = 0;
         while(Search && i < 8)
         {
-            let j;
-            for (j = 0; j < 8; j++)
+            for (let j = 0; j < 8; j++)
             {
                 if( possibleMoves[i][j] == "p")
                 {
+                    gameBoard = copyBoard(board);
                     placePiece(i, j, gameBoard, "white")
                     changeMiddlePieces(i, j, gameBoard, "white")
                     eval = miniMax(gameBoard, depth-1, false);
+                    /*console.log(i+", "+j + " White to Choose Value is: " + eval[0]);*/
                     if( eval[0] > maxEval )
                     {
                         maxEval = eval[0];
@@ -833,26 +837,25 @@ function miniMax(board, depth, maximizingPlayer)
     else
     {
         /*console.log("running minimax for black at depth " + depth);*/
-        gameBoard = copyBoard(board);
         minEval = 100000000000000;
-        possibleMoves = getPossibleMoves(board, "black");
         /* loop through every move and recursively call miniMax */
         let i = 0;
         while(Search && i < 8)
         {
-            let j;
-            for (j = 0; j < 8; j++)
+            for (let j = 0; j < 8; j++)
             {
                 /*console.log(possibleMoves[i][j] + " At "+ i + ", "+ j);*/
                 if( possibleMoves[i][j] == "p")
                 {
                     /*console.log(i+", "+j);*/
-
+                    gameBoard = copyBoard(board);
+                    /*console.log(board)*/
                     placePiece(i, j, gameBoard, "black")
                     changeMiddlePieces(i, j, gameBoard, "black")
+                    console.log(gameBoard)
                     eval = miniMax(gameBoard, depth-1, true);
-                    /*console.log("recursive call done");
-                    console.log(i+", "+j);*/
+                    /*console.log("recursive call done");*/
+                    /*console.log(i+", "+j + " Black to Choose Value is: " + eval[0]);*/
                     
                     if(eval[0] < minEval)
                     {
