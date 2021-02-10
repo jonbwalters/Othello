@@ -13,11 +13,23 @@ const whiteTurnText = document.querySelectorAll(".white-turn-text");
 const blackTurntext = document.querySelectorAll(".black-turn-text");
 const whiteScoretext = document.querySelectorAll(".white-score-text")
 const blackScoretext = document.querySelectorAll(".black-score-text")
+const depthText = document.querySelectorAll(".depth-text");
 const divider = document.querySelector("#divider")
 let HumanIsWhite = true;
 let GameOver = false;
-let Depth = 4;
+let Depth = 6;
 let DEBUG = false;
+let PRUNE;
+let PLAYAI = true;
+if (Depth >=6)
+{
+    PRUNE = true;
+}
+else
+{
+    PRUNE = false;
+}
+
 let WhitesTurn = true;
 let DoAlphaBetaPrune = false;
 
@@ -26,9 +38,30 @@ const refreshButton = document.querySelector('.refresh-button');
 refreshButton.addEventListener('click',function(){location.reload()});
 
 const debugButton = document.querySelector('.debug-button');
-debugButton.addEventListener('click',function(){DEBUG = !DEBUG});
+debugButton.addEventListener('click',function(){DEBUG = !DEBUG;});
+
+const depthButton = document.querySelector('.depth-button');
+depthButton.addEventListener('click', function(){changeDepth();});
+
+const playAIButton = document.querySelector('.playAI-button');
+playAIButton.addEventListener('click', function(){PLAYAI = !PLAYAI;});
+
+const pruneButton = document.querySelector('.prune-button');
 
 
+ pruneButton.addEventListener("click", function (){
+    var background = document.getElementById('prune').style.background;
+    if(PRUNE){
+        document.getElementById('prune').style.background = "rgb(238,138,107)";
+    }
+    else
+    {
+        document.getElementById('prune').style.background = "rgb(163, 228, 166)";
+        
+    }
+    PRUNE = !PRUNE;
+    updateHTML();
+});
 
 
 
@@ -80,6 +113,145 @@ let blackPlayer =
         [0, 0, 0, 0, 0, 0, 0, 0]
     ],
     numberOfPossible: 4
+}
+
+function AlphaBetaPrune(board, depth, alpha, beta, maximizingPlayer)
+{
+    let bestMoveRow;
+    let bestMoveCol;
+    let Search;
+    Search = true;
+    let gameBoard;
+    let maxEval;
+    let minEval;
+    let eval;
+    let possibleMoves;
+    if (maximizingPlayer)
+    {
+        possibleMoves = getPossibleMoves(board, "white");
+    }
+    else
+    {
+        possibleMoves = getPossibleMoves(board, "black");
+    }
+    numberOfPossibleMoves = getPossibleCount(possibleMoves);
+    if(depth == 0 || isGameOver(board) || numberOfPossibleMoves == 0)
+    {
+        /*console.log("reached depth 0")
+        console.log(Heuristic(board));*/
+        /*console.log(board)*/
+        return [Heuristic(board), -1, -1];
+    }
+    else if(maximizingPlayer)
+    {
+        
+        maxEval = -1000000000000000;
+        /* loop through every move and recursively call miniMax */
+        let i = 0;
+        while(Search && i < 8)
+        {
+            for (let j = 0; j < 8; j++)
+            {
+                if( possibleMoves[i][j] == "p")
+                {
+                    gameBoard = copyBoard(board);
+                    placePiece(i, j, gameBoard, "white")
+                    changeMiddlePieces(i, j, gameBoard, "white")
+                    eval = AlphaBetaPrune(gameBoard, depth-1, alpha, beta, false);
+                    /*console.log(i+", "+j + " White to Choose Value is: " + eval[0]);*/
+                    if( eval[0] > maxEval )
+                    {
+                        maxEval = eval[0];
+                        bestMoveRow = i;
+                        bestMoveCol = j;
+                        /*console.log(bestMoveRow + ", " + bestMoveCol);*/
+                    }
+                    if( eval[0] > alpha)
+                    {
+                        alpha = eval[0];
+                    }
+                    if( beta <= alpha)
+                    {
+                        j = 9; /*will break out of the inner for loop*/
+                        Search = false;
+                        
+                    }
+
+                }
+            }
+            i++;
+        }
+        return [maxEval, bestMoveRow, bestMoveCol]
+    }
+    else
+    {
+        /*console.log("running minimax for black at depth " + depth);*/
+        minEval = 100000000000000;
+        /* loop through every move and recursively call miniMax */
+        let i = 0;
+        while(Search && i < 8)
+        {
+            for (let j = 0; j < 8; j++)
+            {
+                /*console.log(possibleMoves[i][j] + " At "+ i + ", "+ j);*/
+                if( possibleMoves[i][j] == "p")
+                {
+                    /*console.log(i+", "+j);*/
+                    gameBoard = copyBoard(board);
+                    /*console.log(board)*/
+                    placePiece(i, j, gameBoard, "black")
+                    changeMiddlePieces(i, j, gameBoard, "black")
+                    console.log(gameBoard)
+                    eval = AlphaBetaPrune(gameBoard, depth-1, alpha, beta, true);
+                    /*console.log("recursive call done");*/
+                    /*console.log(i+", "+j + " Black to Choose Value is: " + eval[0]);*/
+                    
+                    if(eval[0] < minEval)
+                    {
+                        minEval = eval[0];
+                        bestMoveRow = i;
+                        bestMoveCol = j;
+                        /*console.log(bestMoveRow+", "+bestMoveCol);*/
+                    }
+                    if( eval[0] < beta)
+                    {
+                        beta = eval[0];
+                    }
+                    if( beta <= alpha)
+                    {
+                        j=9; /*will break out of the inner for loop*/
+                        Search = false;
+                        
+                    }
+                    /*console.log("Best move is: " + bestMoveRow+", "+bestMoveCol);*/
+                }
+            }
+            i++;
+        }
+        return [minEval, bestMoveRow, bestMoveCol]
+    }
+}
+
+/* Here we will change the depth of the MiniMax search */
+function changeDepth()
+{
+    if(Depth < 8)
+    {
+        Depth = Depth + 2;
+    }
+    else
+    {
+        Depth = 2;
+    }
+    if (Depth >=6)
+    {
+        PRUNE = true;
+    }
+    else
+    {
+        PRUNE = false;
+    }
+    updateHTML();
 }
 
 function changeMiddlePieces(row, col, board, color)
@@ -734,45 +906,92 @@ function isWinningBoard(board, color)
 
 function makeAImove()
 {
-    let minimaxmove;
-    if (HumanIsWhite)
+    if(!PRUNE)
     {
-        if (blackPlayer.numberOfPossible > 1)
+        let minimaxmove;
+        if (HumanIsWhite)
         {
-            minimaxmove = miniMax(board, Depth, false)
-            console.log(minimaxmove);
-            console.log("Placing Piece for black")
-            /*setTimeout(function(){placePiece(minimaxmove[1], minimaxmove[2], board, "black")}, 200);*/
-            placePiece(minimaxmove[1], minimaxmove[2], board, "black");
-            changeMiddlePieces(minimaxmove[1], minimaxmove[2], board, "black");
-        }
-        else
-        {
-            let i;
-            let j;
-            for(i=0; i<8; i++)
+            if (blackPlayer.numberOfPossible > 1)
             {
-                for(j=0; j<8; j++)
+                minimaxmove = miniMax(board, Depth, false)
+                console.log(minimaxmove);
+                console.log("Placing Piece for black")
+                /*setTimeout(function(){placePiece(minimaxmove[1], minimaxmove[2], board, "black")}, 200);*/
+                placePiece(minimaxmove[1], minimaxmove[2], board, "black");
+                changeMiddlePieces(minimaxmove[1], minimaxmove[2], board, "black");
+            }
+            else
+            {
+                let i;
+                let j;
+                for(i=0; i<8; i++)
                 {
-                    if(blackPlayer.possiblemoves[i][j] == "p")
+                    for(j=0; j<8; j++)
                     {
-                        console.log("Making Black's Only Possible Move");
-                        placePiece(i, j, board, "black");
-                        changeMiddlePieces(i, j, board, "black");
+                        if(blackPlayer.possiblemoves[i][j] == "p")
+                        {
+                            console.log("Making Black's Only Possible Move");
+                            placePiece(i, j, board, "black");
+                            changeMiddlePieces(i, j, board, "black");
+                        }
                     }
                 }
             }
+            whitePlayer.possiblemoves = getPossibleMoves(board, "white");
+            blackPlayer.possiblemoves = getPossibleMoves(board, "black");
+            whitePlayer.numberOfPossible = getPossibleCount(whitePlayer.possiblemoves);
+            blackPlayer.numberOfPossible = getPossibleCount(blackPlayer.possiblemoves);
+            WhitesTurn =! WhitesTurn;
+            GameOver = isGameOver(board);
+            updateHTML();
+            if(!GameOver)
+            {
+                PlayGame();
+            }
         }
-        whitePlayer.possiblemoves = getPossibleMoves(board, "white");
-        blackPlayer.possiblemoves = getPossibleMoves(board, "black");
-        whitePlayer.numberOfPossible = getPossibleCount(whitePlayer.possiblemoves);
-        blackPlayer.numberOfPossible = getPossibleCount(blackPlayer.possiblemoves);
-        WhitesTurn =! WhitesTurn;
-        GameOver = isGameOver(board);
-        updateHTML();
-        if(!GameOver)
+    }
+    else
+    {
+        let AlphaBetaMove;
+        if (HumanIsWhite)
         {
-            PlayGame();
+            if (blackPlayer.numberOfPossible > 1)
+            {
+                AlphaBetaMove = AlphaBetaPrune(board, Depth, -100000000000000000, 100000000000000000, false)
+                console.log(AlphaBetaMove);
+                console.log("Placing Piece for black")
+                /*setTimeout(function(){placePiece(minimaxmove[1], minimaxmove[2], board, "black")}, 200);*/
+                placePiece(AlphaBetaMove[1], AlphaBetaMove[2], board, "black");
+                changeMiddlePieces(AlphaBetaMove[1], AlphaBetaMove[2], board, "black");
+            }
+            else
+            {
+                let i;
+                let j;
+                for(i=0; i<8; i++)
+                {
+                    for(j=0; j<8; j++)
+                    {
+                        if(blackPlayer.possiblemoves[i][j] == "p")
+                        {
+                            console.log("Making Black's Only Possible Move");
+                            placePiece(i, j, board, "black");
+                            changeMiddlePieces(i, j, board, "black");
+                        }
+                    }
+                }
+            }
+            whitePlayer.possiblemoves = getPossibleMoves(board, "white");
+            blackPlayer.possiblemoves = getPossibleMoves(board, "black");
+            whitePlayer.numberOfPossible = getPossibleCount(whitePlayer.possiblemoves);
+            blackPlayer.numberOfPossible = getPossibleCount(blackPlayer.possiblemoves);
+            WhitesTurn =! WhitesTurn;
+            GameOver = isGameOver(board);
+            updateHTML();
+            if(!GameOver)
+            {
+                PlayGame();
+            }
         }
     }
 }
@@ -888,6 +1107,8 @@ function placePiece(row, col, grid, color)
 
 function PlayGame()
 {
+    
+    console.log(Depth);
     if(WhitesTurn && whitePlayer.numberOfPossible == 0)
     {
         WhitesTurn = !WhitesTurn
@@ -900,16 +1121,23 @@ function PlayGame()
     updateHTML();
     if(!GameOver)
     {
-        let minimaxmove;
-        /*giveCellsClick();*/
-        if(HumanIsWhite && WhitesTurn)
-        { 
-            giveCellsClick();
-        }
-        else if(HumanIsWhite && !WhitesTurn)
+        if(PLAYAI)
         {
-            setTimeout(makeAImove, 500);
+            if(HumanIsWhite && WhitesTurn)
+            { 
+                giveCellsClick();
+            }
+            else if(HumanIsWhite && !WhitesTurn)
+            {
+                setTimeout(makeAImove, 500);
+            }
         }
+        else
+        {
+           giveCellsClick();
+        }
+        /*giveCellsClick();*/
+        
     }
     
 }
@@ -923,6 +1151,7 @@ function updateHTML()
     let i; 
     let j;
     updateScoreHTML(whiteScore, blackScore);
+    updateDepthHTML()
     if (!WhitesTurn) 
     {
         for (let i = 0; i < whiteTurnText.length; i++) 
@@ -995,7 +1224,32 @@ function updateHTML()
         }
 
     }
+    if(!PRUNE){
+        document.getElementById('prune').style.background = "rgb(238,138,107)";
+        document.getElementById('prune').textContent = 'Pruning OFF';
+    }
+    else
+    {
+        document.getElementById('prune').style.background = "rgb(163, 228, 166)";
+        document.getElementById('prune').textContent = 'Pruning ON';
+    }
 
+}
+
+function updateDepthHTML()
+{
+    if(Depth < 6)
+    {
+        for (let i = 0; i < depthText.length; i++) {            
+            depthText[i].innerHTML = "Current Depth: "+ Depth;
+        }
+    }
+    else
+    {
+        for (let i = 0; i < depthText.length; i++) {            
+            depthText[i].innerHTML = "Current Depth: "+ Depth + '<br /> ' +" (Pruning By Default)";
+        }
+    }
 }
 
 function updateScoreHTML(whiteScore, blackScore)

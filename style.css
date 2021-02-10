@@ -27,6 +27,7 @@ div {
 
 
 
+
 td {
     text-align: center;
     background-color: #4b9b4f; 
@@ -43,7 +44,7 @@ td {
 }
 
 p {
-    background-color: #a3e4a6;
+    background-color: rgb(163, 228, 166);
     transition: background-color .5s;
   } 
   
@@ -54,18 +55,70 @@ p {
 
 .refresh-button
 {
-    background-color: #b3b6b3; 
+    
+    background-color: #777977; 
 }
+    .refresh-button:hover {
+        background-color: #f7f8f7;
+    }
+    .refresh-button:active{
+        background-color: rgb(187, 217, 243);
+    }
 .debug-button
 {
-    background-color: #b3b6b3; 
+    
+    background-color: #777977; 
 }
-.prune-button
+    .debug-button:hover {
+        background-color: #f7f8f7;
+    }
+    .debug-button:active{
+        background-color: rgb(187, 217, 243);
+    }
+.depth-button
 {
-    background-color: #b3b6b3; 
+    
+    background-color: #777977; 
 }
+    .depth-button:hover {
+        background-color: #f7f8f7;
+    }
+    .depth-button:active{
+        background-color: rgb(187, 217, 243);
+    }
+
+.playAI-button
+    {
+        
+        background-color: #777977; 
+    }
+        .playAI-button:hover {
+            background-color: #f7f8f7;
+        }
+        .playAI-button:active{
+            background-color: rgb(187, 217, 243);
+        }    
+
+.prune-button
+    {
+       
+        background-color:rgb(238, 138, 107); 
+   
+    }
+    .prune-button:hover {
+        background-color: #f7f8f7;
+    }
+    
+    
 
 
+
+.depth-text {
+    text-align: center;
+    color: #f7f8f7;
+    font-family: "open sans";
+    font-size: 10px;
+}
 
 .white-turn-text {
     text-align: center;
@@ -217,4 +270,35 @@ b {
     .black-turn-text {
         font-size: 35px;
     }
+}
+
+body {margin:0;}
+
+.navbar {
+  overflow: hidden;
+  background-color: #333;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.navbar a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.navbar a:hover {
+  background: #ddd;
+  color: black;
+}
+
+.main {
+  padding: 16px;
+  margin-top: 30px;
+  height: 1500px; /* Used in this example to enable scrolling */
 }
