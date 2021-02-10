@@ -1,3 +1,5 @@
+/* Jonathan Walters (101 - 77 - 508)
+CSC 475/550 - Winter 2021*/
 /* Restarting the script to separate out the HTML updates from the Back End Program */
 /* Gameplay mechanics reimplemented as of January 28
 However, HTML now updates after every move instead of with the moves
@@ -6,7 +8,9 @@ back end to make moves on boards that are not the gameboard that is attached to 
 Things which still need to be done: 
 1. Allow for skipping a player if no possible moves
 2. Implement a Check to see if game is over in current board state
-3. Update HTML Winner when game is over */
+3. Update HTML Winner when game is over
+4. Heuristic works fina
+5. MiniMax and Alpha Beta are working  */
 
 
 const whiteTurnText = document.querySelectorAll(".white-turn-text");
@@ -44,13 +48,13 @@ const depthButton = document.querySelector('.depth-button');
 depthButton.addEventListener('click', function(){changeDepth();});
 
 const playAIButton = document.querySelector('.playAI-button');
-playAIButton.addEventListener('click', function(){PLAYAI = !PLAYAI;});
+playAIButton.addEventListener('click', function(){
+    PLAYAI = !PLAYAI; 
+    updateHTML();
+});
 
 const pruneButton = document.querySelector('.prune-button');
-
-
- pruneButton.addEventListener("click", function (){
-    var background = document.getElementById('prune').style.background;
+pruneButton.addEventListener("click", function (){
     if(PRUNE){
         document.getElementById('prune').style.background = "rgb(238,138,107)";
     }
@@ -1108,7 +1112,6 @@ function placePiece(row, col, grid, color)
 function PlayGame()
 {
     
-    console.log(Depth);
     if(WhitesTurn && whitePlayer.numberOfPossible == 0)
     {
         WhitesTurn = !WhitesTurn
@@ -1232,6 +1235,15 @@ function updateHTML()
     {
         document.getElementById('prune').style.background = "rgb(163, 228, 166)";
         document.getElementById('prune').textContent = 'Pruning ON';
+    }
+
+    if(PLAYAI)
+    {
+        document.getElementById('AIbutton').textContent = 'Human VS. AI (click for two players)';
+    }
+    else
+    {
+        document.getElementById('AIbutton').textContent = 'Human VS.Human (click for AI player)';
     }
 
 }
