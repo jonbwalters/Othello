@@ -21,10 +21,11 @@ const depthText = document.querySelectorAll(".depth-text");
 const divider = document.querySelector("#divider")
 let HumanIsWhite = true;
 let GameOver = false;
-let Depth = 6;
+let Depth = 2;
 let DEBUG = false;
 let PRUNE;
 let PLAYAI = true;
+let NumberConsidered = 0;
 if (Depth >=6)
 {
     PRUNE = true;
@@ -42,7 +43,10 @@ const refreshButton = document.querySelector('.refresh-button');
 refreshButton.addEventListener('click',function(){location.reload()});
 
 const debugButton = document.querySelector('.debug-button');
-debugButton.addEventListener('click',function(){DEBUG = !DEBUG;});
+debugButton.addEventListener('click',function(){
+    DEBUG = !DEBUG;
+    updateHTML();
+});
 
 const depthButton = document.querySelector('.depth-button');
 depthButton.addEventListener('click', function(){changeDepth();});
@@ -144,7 +148,13 @@ function AlphaBetaPrune(board, depth, alpha, beta, maximizingPlayer)
         /*console.log("reached depth 0")
         console.log(Heuristic(board));*/
         /*console.log(board)*/
-        return [Heuristic(board), -1, -1];
+        if(DEBUG)
+        {
+            console.log("reached depth 0");
+            console.log(board);
+            console.log("Heuristic Value for above board Is: "+Heuristic(board));
+        }
+        return [Heuristic(board), -1, -1];     
     }
     else if(maximizingPlayer)
     {
@@ -152,17 +162,23 @@ function AlphaBetaPrune(board, depth, alpha, beta, maximizingPlayer)
         maxEval = -1000000000000000;
         /* loop through every move and recursively call miniMax */
         let i = 0;
+        if(DEBUG)
+        {
+            gameBoard = copyBoard(board);
+            console.log("Depth of the board below is: " + depth);
+            console.log(gameBoard);
+        }
         while(Search && i < 8)
         {
             for (let j = 0; j < 8; j++)
             {
                 if( possibleMoves[i][j] == "p")
                 {
+                    NumberConsidered++;
                     gameBoard = copyBoard(board);
                     placePiece(i, j, gameBoard, "white")
                     changeMiddlePieces(i, j, gameBoard, "white")
                     eval = AlphaBetaPrune(gameBoard, depth-1, alpha, beta, false);
-                    /*console.log(i+", "+j + " White to Choose Value is: " + eval[0]);*/
                     if( eval[0] > maxEval )
                     {
                         maxEval = eval[0];
@@ -193,6 +209,12 @@ function AlphaBetaPrune(board, depth, alpha, beta, maximizingPlayer)
         minEval = 100000000000000;
         /* loop through every move and recursively call miniMax */
         let i = 0;
+        if(DEBUG)
+        {
+            gameBoard = copyBoard(board);
+            console.log("Depth of the board below is: " + depth);
+            console.log(gameBoard);
+        }
         while(Search && i < 8)
         {
             for (let j = 0; j < 8; j++)
@@ -200,12 +222,12 @@ function AlphaBetaPrune(board, depth, alpha, beta, maximizingPlayer)
                 /*console.log(possibleMoves[i][j] + " At "+ i + ", "+ j);*/
                 if( possibleMoves[i][j] == "p")
                 {
+                    NumberConsidered++;
                     /*console.log(i+", "+j);*/
                     gameBoard = copyBoard(board);
                     /*console.log(board)*/
                     placePiece(i, j, gameBoard, "black")
                     changeMiddlePieces(i, j, gameBoard, "black")
-                    console.log(gameBoard)
                     eval = AlphaBetaPrune(gameBoard, depth-1, alpha, beta, true);
                     /*console.log("recursive call done");*/
                     /*console.log(i+", "+j + " Black to Choose Value is: " + eval[0]);*/
@@ -910,6 +932,7 @@ function isWinningBoard(board, color)
 
 function makeAImove()
 {
+    NumberConsidered = 0;
     if(!PRUNE)
     {
         let minimaxmove;
@@ -919,7 +942,7 @@ function makeAImove()
             {
                 minimaxmove = miniMax(board, Depth, false)
                 console.log(minimaxmove);
-                console.log("Placing Piece for black")
+                console.log("Placing Piece for black after considering " + NumberConsidered + " possible moves.")
                 /*setTimeout(function(){placePiece(minimaxmove[1], minimaxmove[2], board, "black")}, 200);*/
                 placePiece(minimaxmove[1], minimaxmove[2], board, "black");
                 changeMiddlePieces(minimaxmove[1], minimaxmove[2], board, "black");
@@ -963,7 +986,7 @@ function makeAImove()
             {
                 AlphaBetaMove = AlphaBetaPrune(board, Depth, -100000000000000000, 100000000000000000, false)
                 console.log(AlphaBetaMove);
-                console.log("Placing Piece for black")
+                console.log("Placing Piece for black after considering " + NumberConsidered + " possible moves.")
                 /*setTimeout(function(){placePiece(minimaxmove[1], minimaxmove[2], board, "black")}, 200);*/
                 placePiece(AlphaBetaMove[1], AlphaBetaMove[2], board, "black");
                 changeMiddlePieces(AlphaBetaMove[1], AlphaBetaMove[2], board, "black");
@@ -1000,6 +1023,7 @@ function makeAImove()
     }
 }
 
+/* Below we implement the MiniMax algorithm */
 function miniMax(board, depth, maximizingPlayer)
 {
     let bestMoveRow;
@@ -1020,17 +1044,28 @@ function miniMax(board, depth, maximizingPlayer)
         possibleMoves = getPossibleMoves(board, "black");
     }
     numberOfPossibleMoves = getPossibleCount(possibleMoves);
+    /* Calculate Heuristic if at the bottom of search or if can't go further down */
     if(depth == 0 || isGameOver(board) || numberOfPossibleMoves == 0)
     {
-        /*console.log("reached depth 0")
-        console.log(Heuristic(board));*/
-        /*console.log(board)*/
+        if(DEBUG)
+        {
+            console.log("reached depth 0")
+            console.log("Heuristic Value for the board below is: "+Heuristic(board));
+            console.log(board)
+        }
+        
         return [Heuristic(board), -1, -1];
     }
     else if(maximizingPlayer)
     {
         
         maxEval = -1000000000000000;
+        if(DEBUG)
+        {
+            gameBoard = copyBoard(board);
+            console.log("Depth of the board below is: " + depth);
+            console.log(gameBoard);
+        }
         /* loop through every move and recursively call miniMax */
         let i = 0;
         while(Search && i < 8)
@@ -1039,17 +1074,17 @@ function miniMax(board, depth, maximizingPlayer)
             {
                 if( possibleMoves[i][j] == "p")
                 {
+                    NumberConsidered++;
                     gameBoard = copyBoard(board);
                     placePiece(i, j, gameBoard, "white")
                     changeMiddlePieces(i, j, gameBoard, "white")
                     eval = miniMax(gameBoard, depth-1, false);
-                    /*console.log(i+", "+j + " White to Choose Value is: " + eval[0]);*/
+                    /* We will now essentially implement maxEval = max(eval, maxEval) */
                     if( eval[0] > maxEval )
                     {
                         maxEval = eval[0];
                         bestMoveRow = i;
                         bestMoveCol = j;
-                        /*console.log(bestMoveRow + ", " + bestMoveCol);*/
                     }
                 }
             }
@@ -1059,35 +1094,35 @@ function miniMax(board, depth, maximizingPlayer)
     }
     else
     {
-        /*console.log("running minimax for black at depth " + depth);*/
+        
         minEval = 100000000000000;
+        if(DEBUG)
+        {
+            gameBoard = copyBoard(board);
+            console.log("Depth of the board below is: " + depth);
+            console.log(gameBoard);
+        }
         /* loop through every move and recursively call miniMax */
         let i = 0;
         while(Search && i < 8)
         {
             for (let j = 0; j < 8; j++)
             {
-                /*console.log(possibleMoves[i][j] + " At "+ i + ", "+ j);*/
                 if( possibleMoves[i][j] == "p")
                 {
-                    /*console.log(i+", "+j);*/
+                    NumberConsidered++;
                     gameBoard = copyBoard(board);
                     /*console.log(board)*/
                     placePiece(i, j, gameBoard, "black")
                     changeMiddlePieces(i, j, gameBoard, "black")
-                    console.log(gameBoard)
                     eval = miniMax(gameBoard, depth-1, true);
-                    /*console.log("recursive call done");*/
-                    /*console.log(i+", "+j + " Black to Choose Value is: " + eval[0]);*/
-                    
+                    /* We will now essentially implement minEval = min(eval, minEval) */
                     if(eval[0] < minEval)
                     {
                         minEval = eval[0];
                         bestMoveRow = i;
-                        bestMoveCol = j;
-                        /*console.log(bestMoveRow+", "+bestMoveCol);*/
+                        bestMoveCol = j;   
                     }
-                    /*console.log("Best move is: " + bestMoveRow+", "+bestMoveCol);*/
                 }
             }
             i++;
@@ -1246,6 +1281,15 @@ function updateHTML()
         document.getElementById('AIbutton').textContent = 'Human VS.Human (click for AI player)';
     }
 
+    if(DEBUG)
+    {
+        document.getElementById('debug').textContent = 'Debug ON';
+    }
+    else
+    {
+        document.getElementById('debug').textContent = 'Debug OFF';
+    }
+
 }
 
 function updateDepthHTML()
@@ -1302,9 +1346,3 @@ function updateScoreHTML(whiteScore, blackScore)
 updateHTML();
 PlayGame();
 
-
-/*while(whitePlayer.score + blackPlayer.score < 64 && (whitePlayer.numberOfPossible + blackPlayer.numberOfPossible !=0))
-{
-    updateHTML();
-    giveCellsClick();
-}*/
