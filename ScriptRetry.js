@@ -1,24 +1,27 @@
 /* Jonathan Walters (101 - 77 - 508)
-CSC 475/550 - Winter 2021*/
+CSC 475/550 - Winter 2021
+Assignment 2 - Program the Othello Game and Implement the MiniMax Algorithm 
+Also implement Alpha-Beta Pruning*/
+/*----------------------------------------------------------------------------------*/
 /* Restarting the script to separate out the HTML updates from the Back End Program */
 /* Gameplay mechanics reimplemented as of January 28
 However, HTML now updates after every move instead of with the moves
 Essentially, HTML and Backend Javascript have been separated as much as possible to allow for
 back end to make moves on boards that are not the gameboard that is attached to HTML elements
-Things which still need to be done: 
-1. Allow for skipping a player if no possible moves
-2. Implement a Check to see if game is over in current board state
-3. Update HTML Winner when game is over
-4. Heuristic works fina
+/*----------------------------------------------------------------------------------*/
+/*Things which still need to be done: 
+4. Heuristic works fine
 5. MiniMax and Alpha Beta are working  */
 
-
+/* HTML Contacts for Javascript Use*/
 const whiteTurnText = document.querySelectorAll(".white-turn-text");
 const blackTurntext = document.querySelectorAll(".black-turn-text");
 const whiteScoretext = document.querySelectorAll(".white-score-text")
 const blackScoretext = document.querySelectorAll(".black-score-text")
 const depthText = document.querySelectorAll(".depth-text");
 const divider = document.querySelector("#divider")
+
+/* Global Variables which will be accessed by almost every function as needed */
 let HumanIsWhite = true;
 let GameOver = false;
 let Depth = 2;
@@ -26,6 +29,8 @@ let DEBUG = false;
 let PRUNE;
 let PLAYAI = true;
 let NumberConsidered = 0;
+
+/* We'll turn on Pruning if depth is greater than 6 by default */
 if (Depth >=6)
 {
     PRUNE = true;
@@ -36,7 +41,7 @@ else
 }
 
 let WhitesTurn = true;
-let DoAlphaBetaPrune = false;
+
 
 /* The following are buttons for HTML attachment*/
 const refreshButton = document.querySelector('.refresh-button');
@@ -55,6 +60,13 @@ const playAIButton = document.querySelector('.playAI-button');
 playAIButton.addEventListener('click', function(){
     PLAYAI = !PLAYAI; 
     updateHTML();
+});
+
+const swapColorButton = document.querySelector('.color-button');
+swapColorButton.addEventListener('click', function(){
+    HumanIsWhite = !HumanIsWhite; 
+    updateHTML();
+    PlayGame();
 });
 
 const pruneButton = document.querySelector('.prune-button');
@@ -976,6 +988,46 @@ function makeAImove()
                 PlayGame();
             }
         }
+        else  /* if human is black */
+        {
+            if (blackPlayer.numberOfPossible > 1)
+            {
+                minimaxmove = miniMax(board, Depth, true)
+                console.log(minimaxmove);
+                console.log("Placing Piece for black after considering " + NumberConsidered + " possible moves.")
+                /*setTimeout(function(){placePiece(minimaxmove[1], minimaxmove[2], board, "black")}, 200);*/
+                placePiece(minimaxmove[1], minimaxmove[2], board, "white");
+                changeMiddlePieces(minimaxmove[1], minimaxmove[2], board, "white");
+            }
+            else
+            {
+                let i;
+                let j;
+                for(i=0; i<8; i++)
+                {
+                    for(j=0; j<8; j++)
+                    {
+                        if(blackPlayer.possiblemoves[i][j] == "p")
+                        {
+                            console.log("Making Whites's Only Possible Move");
+                            placePiece(i, j, board, "white");
+                            changeMiddlePieces(i, j, board, "white");
+                        }
+                    }
+                }
+            }
+            whitePlayer.possiblemoves = getPossibleMoves(board, "white");
+            blackPlayer.possiblemoves = getPossibleMoves(board, "black");
+            whitePlayer.numberOfPossible = getPossibleCount(whitePlayer.possiblemoves);
+            blackPlayer.numberOfPossible = getPossibleCount(blackPlayer.possiblemoves);
+            WhitesTurn =! WhitesTurn;
+            GameOver = isGameOver(board);
+            updateHTML();
+            if(!GameOver)
+            {
+                PlayGame();
+            }
+        }
     }
     else
     {
@@ -986,7 +1038,7 @@ function makeAImove()
             {
                 AlphaBetaMove = AlphaBetaPrune(board, Depth, -100000000000000000, 100000000000000000, false)
                 console.log(AlphaBetaMove);
-                console.log("Placing Piece for black after considering " + NumberConsidered + " possible moves.")
+                console.log("Placing Piece for white after considering " + NumberConsidered + " possible moves.")
                 /*setTimeout(function(){placePiece(minimaxmove[1], minimaxmove[2], board, "black")}, 200);*/
                 placePiece(AlphaBetaMove[1], AlphaBetaMove[2], board, "black");
                 changeMiddlePieces(AlphaBetaMove[1], AlphaBetaMove[2], board, "black");
@@ -1004,6 +1056,46 @@ function makeAImove()
                             console.log("Making Black's Only Possible Move");
                             placePiece(i, j, board, "black");
                             changeMiddlePieces(i, j, board, "black");
+                        }
+                    }
+                }
+            }
+            whitePlayer.possiblemoves = getPossibleMoves(board, "white");
+            blackPlayer.possiblemoves = getPossibleMoves(board, "black");
+            whitePlayer.numberOfPossible = getPossibleCount(whitePlayer.possiblemoves);
+            blackPlayer.numberOfPossible = getPossibleCount(blackPlayer.possiblemoves);
+            WhitesTurn =! WhitesTurn;
+            GameOver = isGameOver(board);
+            updateHTML();
+            if(!GameOver)
+            {
+                PlayGame();
+            }
+        }
+        else /* If Human is Black */
+        {
+            if (blackPlayer.numberOfPossible > 1)
+            {
+                AlphaBetaMove = AlphaBetaPrune(board, Depth, -100000000000000000, 100000000000000000, true)
+                console.log(AlphaBetaMove);
+                console.log("Placing Piece for white after considering " + NumberConsidered + " possible moves.")
+                /*setTimeout(function(){placePiece(minimaxmove[1], minimaxmove[2], board, "black")}, 200);*/
+                placePiece(AlphaBetaMove[1], AlphaBetaMove[2], board, "white");
+                changeMiddlePieces(AlphaBetaMove[1], AlphaBetaMove[2], board, "white");
+            }
+            else
+            {
+                let i;
+                let j;
+                for(i=0; i<8; i++)
+                {
+                    for(j=0; j<8; j++)
+                    {
+                        if(blackPlayer.possiblemoves[i][j] == "p")
+                        {
+                            console.log("Making Whites's Only Possible Move");
+                            placePiece(i, j, board, "white");
+                            changeMiddlePieces(i, j, board, "white");
                         }
                     }
                 }
@@ -1161,11 +1253,11 @@ function PlayGame()
     {
         if(PLAYAI)
         {
-            if(HumanIsWhite && WhitesTurn)
+            if((HumanIsWhite && WhitesTurn) || (!HumanIsWhite && !WhitesTurn))
             { 
                 giveCellsClick();
             }
-            else if(HumanIsWhite && !WhitesTurn)
+            else if((HumanIsWhite && !WhitesTurn) || (!HumanIsWhite && WhitesTurn))
             {
                 setTimeout(makeAImove, 500);
             }
@@ -1288,6 +1380,14 @@ function updateHTML()
     else
     {
         document.getElementById('debug').textContent = 'Debug OFF';
+    }
+    if(HumanIsWhite)
+    {
+        document.getElementById('colorbutton').textContent = 'Player 1 is White (Click to Play Black)';
+    }
+    else
+    {
+        document.getElementById('colorbutton').textContent = 'Player 1 is Black (Click to Play White)';
     }
 
 }
