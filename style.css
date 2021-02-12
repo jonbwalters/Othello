@@ -87,6 +87,18 @@ p {
         background-color: rgb(187, 217, 243);
     }
 
+.color-button
+{
+    
+    background-color: #777977; 
+}
+    .color-button:hover {
+        background-color: #f7f8f7;
+    }
+    .color-button:active{
+        background-color: rgb(187, 217, 243);
+    }
+
 .playAI-button
     {
         
