@@ -28,7 +28,9 @@ let Depth = 2;
 let DEBUG = false;
 let PRUNE;
 let PLAYAI = true;
+let RECORD = true;
 let NumberConsidered = 0;
+let gameTrace = [];
 
 /* We'll turn on Pruning if depth is greater than 6 by default */
 if (Depth >=6)
@@ -41,7 +43,6 @@ else
 }
 
 let WhitesTurn = true;
-
 
 /* The following are buttons for HTML attachment*/
 const refreshButton = document.querySelector('.refresh-button');
@@ -1239,6 +1240,10 @@ function placePiece(row, col, grid, color)
 function PlayGame()
 {
     
+    if(RECORD)
+    {
+        pushBoard();
+    }
     if(WhitesTurn && whitePlayer.numberOfPossible == 0)
     {
         WhitesTurn = !WhitesTurn
@@ -1272,7 +1277,19 @@ function PlayGame()
     
 }
 
+function pushBoard()
+{
+    boardCopy = copyBoard(board);
+    gameTrace.push(boardCopy);
+}
 
+function printGameTrace()
+{
+    for(let i=0; i<gameTrace.length; i++ )
+    {
+        console.log(gameTrace[i]);
+    }
+}
 
 function updateHTML()
 {
@@ -1420,6 +1437,10 @@ function updateScoreHTML(whiteScore, blackScore)
 
     if(GameOver)
     {
+        if(RECORD)
+        {
+            printGameTrace();
+        }
         if (blackScore > whiteScore)
             {
                 divider.style.display = "none";
